@@ -1,0 +1,32 @@
+*filter
+
+# Zera as regras existentes
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+
+# Permitir tráfego de loopback (localhost)
+-A INPUT -i lo -j ACCEPT
+
+# Permitir conexões ESTABELECIDAS e RELACIONADAS
+-A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# Permitir SSH (porta 22)
+-A INPUT -p tcp --dport 22 -j ACCEPT
+
+# Permitir HTTP (porta 80)
+-A INPUT -p tcp --dport 80 -j ACCEPT
+-A INPUT -p udp --dport 80 -j ACCEPT
+
+# Permitir HTTPS (porta 443)
+-A INPUT -p tcp --dport 443 -j ACCEPT
+-A INPUT -p udp --dport 443 -j ACCEPT
+
+# Permitir Minecraft (porta 25565 TCP/UDP)
+-A INPUT -p tcp --dport 25565 -j ACCEPT
+-A INPUT -p udp --dport 25565 -j ACCEPT
+
+# Rejeita tudo o que não foi aceito
+-A INPUT -j DROP
+
+COMMIT
