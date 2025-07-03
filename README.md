@@ -1,6 +1,6 @@
-# Guia para Criação de Imagem Docker com Ubuntu e Firewall IPTables para Raspberry Pi 2
+# Guia para Criação de Imagem Docker com Ubuntu, Firewall IPTables e Nginx para Raspberry Pi 2
 
-Este guia contém instruções detalhadas para criar uma imagem Docker com Ubuntu e firewall, e prepará-la para execução em um Raspberry Pi 2 (arquitetura ARMv7).
+Este guia contém instruções detalhadas para criar uma imagem Docker com Ubuntu, firewall e Nginx, e prepará-la para execução em um Raspberry Pi 2 (arquitetura ARMv7).
 
 ## Visão Geral
 
@@ -14,7 +14,7 @@ O projeto consiste em:
 
 ## Arquivos Incluídos
 
-- `Dockerfile`: Contém as instruções para criar a imagem Docker com Ubuntu e firewall
+- `Dockerfile`: Contém as instruções para criar a imagem Docker com Ubuntu, firewall e Nginx
 - `build-image.sh`: Script para construir a imagem Docker
 - `prepare-sd-card.sh`: Instruções para preparar o cartão SD do Raspberry Pi 2
 - `setup-docker.sh`: Instruções para instalar o Docker e executar o container
@@ -69,6 +69,7 @@ A imagem Docker criada inclui:
 
 - Ubuntu 22.04 para ARMv7
 - Iptables configurado para permitir portas 80, 443 e 22, além de um servidor Minecraft
+- Nginx redirecionando tráfego http para tráfego https e encaminhando para 
 
 ## Requisitos
 

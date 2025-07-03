@@ -39,13 +39,13 @@ docker exec firewall-server iptables -L -n -v
 PASSO 4: APENAS se tiver colocado um servidor nginx/web na imagem, testar o acesso ao servidor web
 --------------------------------------
 # Se tiver colocado um Ngnix na imagem, verifique se há erros nos logs do Nginx dentro do container
-#docker exec nginx-server cat /var/log/nginx/error.log
+docker exec firewall-server cat /var/log/nginx/error.log
 
 # No Raspberry Pi, teste o acesso local
-#curl http://localhost
+curl http://localhost
 
 # Em outro dispositivo na mesma rede, abra um navegador e acesse:
-#http://IP_DO_RASPBERRY
+http://IP_DO_RASPBERRY
 
 # Verifique se a página web é carregada corretamente e se o uptime é exibido
 
@@ -74,7 +74,7 @@ docker ps
 sudo systemctl status docker
 
 # Inicie o container com a flag de reinicialização automática
-docker run -d --name firewall-server --privileged --restart unless-stopped -p 80:80 rpi-ubuntu-iptables:latest
+docker run -d --name firewall-server --privileged --restart unless-stopped --network web-net -p 80:80 rpi-ubuntu-iptables:latest
 
 PASSO 7: Solução de problemas comuns
 ----------------------------------

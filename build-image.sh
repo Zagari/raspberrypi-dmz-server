@@ -4,7 +4,8 @@
 echo "Iniciando build da imagem Docker para Raspberry Pi 2 (ARMv7)..."
 
 # Construir a imagem Docker
-docker build -t rpi-ubuntu-iptables:latest .
+# docker build -t rpi-ubuntu-iptables:latest .
+docker buildx build --platform linux/arm/v7 -t pi-ubuntu-iptables:latest . --output type=docker
 
 # Verificar se a build foi bem-sucedida
 if [ $? -eq 0 ]; then

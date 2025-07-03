@@ -19,9 +19,19 @@ sudo apt-get upgrade -y
 # Instalar dependências
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
 
-# Adicionar a chave GPG oficial do Docker
-curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo apt-key add -
+# Adicionar a chave GPG oficial do Docker 
+# curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo apt-key add -
 
+# Baixe a chave pública e salve em /etc/apt/keyrings/
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo tee /etc/apt/keyrings/docker.asc > /dev/null
+
+# Adicione o repositório usando a chave salva
+# Para Raspberry Pi OS baseado em Debian Bookworm (ou Bullseye):
+echo \
+  "deb [arch=armhf signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/raspbian \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  
 # Adicionar o repositório do Docker
 echo "deb [arch=armhf] https://download.docker.com/linux/raspbian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
 
@@ -62,8 +72,12 @@ docker images
 
 PASSO 3: Executar o container Docker
 ----------------------------------
+
+# Criar uma rede para containers se verem pelo nome
+docker network create web-net
+
 # Executar o container em modo daemon
-docker run -d --name firewall-server --privileged rpi-ubuntu-iptables:latest
+docker run -d --name firewall-server --privileged --network web-net -p 80:80 rpi-ubuntu-iptables:latest
 
 # Verificar se o container está em execução
 docker ps
