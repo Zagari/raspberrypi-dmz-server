@@ -15,6 +15,7 @@ O projeto consiste em:
 
 ## Arquivos Incluídos
 
+```
 raspberrypi-dmz-server/
 ├── docker-compose.yml              # O orquestrador principal
 ├── build-image.sh                  # Script para construir a imagem Docker
@@ -35,7 +36,7 @@ raspberrypi-dmz-server/
     └── certs/                      # Pasta organizada para os certificados
         ├── origin_cloudflare.crt.pem
         └── origin.key
-
+```
 
 ## Passo a Passo
 
