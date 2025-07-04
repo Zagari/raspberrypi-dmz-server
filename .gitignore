@@ -1,0 +1,20 @@
+# Arquivos de ambiente
+.env
+backup/
+
+# Arquivos de Certificados
+nginx/certs/
+
+# Arquivos de Imagens Docker salvas
+*.tar
+
+# Diretório do ambiente virtual Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Arquivos específicos do sistema operacional
+.DS_Store
+Thumbs.db
