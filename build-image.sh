@@ -5,7 +5,7 @@
 set -e
 
 # Nome da imagem e tag para fácil modificação
-IMAGE_NAME="rpi-ubuntu-iptables"
+IMAGE_NAME="rpi-nginx"
 TAG="latest"
 FULL_IMAGE_NAME="${IMAGE_NAME}:${TAG}"
 TAR_FILENAME="${IMAGE_NAME}.tar"

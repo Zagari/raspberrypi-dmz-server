@@ -1,117 +1,164 @@
 #!/bin/bash
 
-# Script com instruções para configurar o Docker no Raspberry Pi 2 e executar o container
-echo "Instruções para instalar o Docker e executar o container no Raspberry Pi 2"
+# Interrompe o script imediatamente se qualquer comando falhar.
+set -e
+
+# Script para configurar o Docker no Raspberry Pi 2 e executar o container
+echo "Instalação do Docker e execução do container no Raspberry Pi 2"
 echo "======================================================================"
-echo ""
-echo "Este script contém apenas instruções. Você precisará executar os comandos manualmente no Raspberry Pi 2."
-echo ""
+echo "Execute este script no seu Raspberry Pi 2 para configurar o Docker e executar o container."
+input("Pressione Enter para continuar...")
 
-cat << 'EOF'
-PASSO 1: Instalar o Docker no Raspberry Pi 2
--------------------------------------------
-Conecte-se ao Raspberry Pi via SSH e execute os comandos abaixo:
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Este script precisa ser executado como root. Use 'sudo' para executar."
+    exit 1
+fi
 
-# Atualizar o sistema
+echo "PASSO 1: Instalar o Docker no Raspberry Pi 2"
+echo "-------------------------------------------"
+
+echo "Atualizando o sistema..."
 sudo apt-get update
 sudo apt-get upgrade -y
 
-# Instalar dependências
+echo "Instalando dependências..."
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
 
-# Adicionar a chave GPG oficial do Docker 
-# curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo apt-key add -
+echo "Adicionando a chave GPG oficial do Docker"
+curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo apt-key add -
 
-# Baixe a chave pública e salve em /etc/apt/keyrings/
+echo "Baixando a chave pública e salvando em /etc/apt/keyrings/"
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo tee /etc/apt/keyrings/docker.asc > /dev/null
 
-# Adicione o repositório usando a chave salva
+echo "Adicionando o repositório usando a chave salva"
 # Para Raspberry Pi OS baseado em Debian Bookworm (ou Bullseye):
 echo \
   "deb [arch=armhf signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/raspbian \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  
-# Adicionar o repositório do Docker
+
+echo "Adicionando o repositório do Docker"
 echo "deb [arch=armhf] https://download.docker.com/linux/raspbian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
 
-# Atualizar a lista de pacotes
+echo "Atualizando a lista de pacotes"
 sudo apt-get update
 
-# Instalar o Docker
+echo "Instalando o Docker"
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# Adicionar o usuário atual ao grupo docker (para executar Docker sem sudo)
+echo "Adicionando o usuário atual ao grupo docker (para executar Docker sem sudo)"
 sudo usermod -aG docker $USER
 
-# Iniciar e habilitar o serviço Docker
+echo "Iniciando e habilitando o serviço Docker"
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# Verificar se o Docker está funcionando
+echo "Verificando se o Docker está funcionando"
 docker --version
 
 # IMPORTANTE: Faça logout e login novamente para que as alterações de grupo tenham efeito
 # ou execute o comando abaixo para aplicar as alterações na sessão atual:
 newgrp docker
 
-PASSO 2: Transferir a imagem Docker para o Raspberry Pi 2
--------------------------------------------------------
+echo "Docker instalado e configurado com sucesso!"
+
+cat << 'EOF'
+PASSO 2: Construir a imagem Docker
+======================================================================
+Opção 1: Transferir a imagem Docker para o Raspberry Pi 2
+----------------------------------------------------------------------
 No seu computador, onde você construiu a imagem:
 
-# Transferir o arquivo rpi-ubuntu-iptables.tar para o Raspberry Pi
-scp rpi-ubuntu-iptables.tar pi@IP_DO_RASPBERRY:~/
+# Transferir o arquivo rpi-nginx.tar para o Raspberry Pi
+scp rpi-nginx.tar pi@IP_DO_RASPBERRY:~/
 
 No Raspberry Pi:
 
 # Carregar a imagem Docker
-docker load < rpi-ubuntu-iptables.tar
+docker load < rpi-nginx.tar
 
-# Verificar se a imagem foi carregada corretamente
+Opção 2: Construir a imagem diretamente no Raspberry Pi
+----------------------------------------------------------------------
+# No Raspberry Pi, execute o seguinte comando para construir a imagem Docker:
+
+cd nginx/
+docker build -t rpi-nginx:latest .
+cd ../app
+docker build -t rpi-webapp:latest .
+ou 
+EOF
+
+echo "Construindo a imagem Docker diretamente no Raspberry Pi"
+docker-compose build
+
+
+echo "-----------------------------------------------------------------------"
+echo "Verificando se a imagem foi carregada ou criada corretamente"
 docker images
 
-PASSO 3: Executar o container Docker
-----------------------------------
+echo "PASSO 3: Executando o container Docker"
+echo "--------------------------------------------"
 
-# Criar uma rede para containers se verem pelo nome
+echo "Criando uma rede para containers se verem pelo nome"
 docker network create web-net
 
-# Executar o container em modo daemon
-docker run -d --name firewall-server --privileged --network web-net -p 80:80 rpi-ubuntu-iptables:latest
+echo "Executando o container em modo daemon"
+#docker run -d --name nginx_proxy --privileged --network web-net -p 80:80 rpi-nginx:latest
+docker-compose up -d
 
-# Verificar se o container está em execução
+echo "Verificando se o container está em execução"
 docker ps
 
-# Verificar os logs do container
-docker logs firewall-server
+echo "Verificando os logs do container"
+docker logs -f nginx
+docker logs -f webapp
 
+cat << 'EOF'
+======================================================================
 PASSO 4: Gerenciar o container
-----------------------------
+------------------------------
+
+Você pode gerenciar o container usando os seguintes comandos:
+
 # Parar o container
-docker stop firewall-server
+docker stop flask_app
+ou
+docker-compose stop webapp
+ou 
+docker-compose stop
 
 # Iniciar o container
-docker start firewall-server
+docker start nginx_proxy
+ou
+docker-compose start nginx
+ou
+docker-compose start
 
 # Reiniciar o container
-docker restart firewall-server
+docker restart nginx_prxy
+ou
+docker-compose restart webapp
+ou
+docker-compose restart
 
 # Remover o container (precisa estar parado)
-docker stop firewall-server
-docker rm firewall-server
+docker stop nginx_proxy
+docker rm nginx_proxy
+ou
+docker-compose down
 
 # Executar o container com reinicialização automática
-docker run -d --name firewall-server --privileged --restart unless-stopped -p 80:80 rpi-ubuntu-iptables:latest
+docker run -d --name nginx_proxy --privileged --restart unless-stopped -p 80:80 rpi-nginx:latest
 
 PASSO 5: Configurar o container para iniciar automaticamente na inicialização
 ---------------------------------------------------------------------------
 O parâmetro --restart unless-stopped já garante que o container seja reiniciado 
 automaticamente quando o Docker for iniciado, mesmo após reinicialização do sistema.
 
-PASSO 7: Verificar o status do firewall
+PASSO 6: Verificar o status do firewall
 -------------------------------------
 # Verificar o status do Iptables dentro do container
-docker exec firewall-server iptables -L -n -v
+iptables -L -n -v
 
 # Se precisar ajustar regras do firewall no host Raspberry Pi:
 sudo iptables -L -n -v                                  #Listar regras do firewall
@@ -122,5 +169,5 @@ sudo iptables-save > /etc/iptables.rules
 EOF
 
 echo ""
-echo "Siga estas instruções para configurar o Docker e executar o container no Raspberry Pi 2."
-echo "Após a execução, você poderá acessar o servidor web através do IP do Raspberry Pi."
+echo
+echo "Agora você poderá acessar o servidor web através do IP do Raspberry Pi."
