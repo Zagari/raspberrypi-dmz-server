@@ -24,7 +24,7 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
 echo "Instalando dependências..."
-sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common lsb_release
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common lsb-release
 
 echo "Adicionando a chave GPG oficial do Docker"
 install -m 0755 -d /etc/apt/keyrings
