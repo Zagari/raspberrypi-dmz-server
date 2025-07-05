@@ -24,29 +24,25 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
 echo "Instalando dependências..."
-sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common lsb_release
 
 echo "Adicionando a chave GPG oficial do Docker"
-curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo apt-key add -
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/raspbian/gpg -o /etc/apt/keyrings/docker.asc
+chmod a+r /etc/apt/keyrings/docker.asc
 
-echo "Baixando a chave pública e salvando em /etc/apt/keyrings/"
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo tee /etc/apt/keyrings/docker.asc > /dev/null
-
-echo "Adicionando o repositório usando a chave salva"
+echo "Adicionando o repositório do Docker para Raspbian..."
 # Para Raspberry Pi OS baseado em Debian Bookworm (ou Bullseye):
 echo \
-  "deb [arch=armhf signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/raspbian \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/raspbian \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-echo "Adicionando o repositório do Docker"
-echo "deb [arch=armhf] https://download.docker.com/linux/raspbian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
 
 echo "Atualizando a lista de pacotes"
 sudo apt-get update
 
-echo "Instalando o Docker"
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+echo "Instalando o Docker Engine e o Docker Compose..."
+# Adicionamos 'docker-compose-plugin' para instalar o Docker Compose V2
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 echo "Adicionando o usuário atual ao grupo docker (para executar Docker sem sudo)"
 sudo usermod -aG docker $USER
@@ -57,12 +53,17 @@ sudo systemctl start docker
 
 echo "Verificando se o Docker está funcionando"
 docker --version
+docker compose version # Note o comando 'docker compose' sem hífen
 
-# IMPORTANTE: Faça logout e login novamente para que as alterações de grupo tenham efeito
-# ou execute o comando abaixo para aplicar as alterações na sessão atual:
-newgrp docker
 
-echo "Docker instalado e configurado com sucesso!"
+echo "Docker e Docker Compose instalados com sucesso!"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "!! IMPORTANTE: Faça logout e login novamente para usar      !!"
+echo "!! o Docker sem 'sudo', ou execute 'newgrp docker'        !!"
+echo "!! em um novo terminal para aplicar as permissões agora.  !!"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Pressione Enter para continuar com o resto do script..."
+read
 
 cat << 'EOF'
 PASSO 2: Construir a imagem Docker
@@ -87,33 +88,41 @@ cd nginx/
 docker build -t rpi-nginx:latest .
 cd ../app
 docker build -t rpi-webapp:latest .
-ou 
+ou...
 EOF
 
-echo "Construindo a imagem Docker diretamente no Raspberry Pi"
-docker-compose build
+# A partir daqui, usaremos 'docker compose' (sem hífen)
+# Os passos de build e execução podem continuar...
+# Certifique-se de que existe um arquivo docker-compose.yml no diretório atual
 
+if [ -f "docker-compose.yml" ]; then
+  echo "Construindo a imagem Docker diretamente no Raspberry Pi com docker compose"
+  docker compose build
 
-echo "-----------------------------------------------------------------------"
-echo "Verificando se a imagem foi carregada ou criada corretamente"
-docker images
+  echo "-----------------------------------------------------------------------"
+  echo "Verificando se a imagem foi carregada ou criada corretamente"
+  docker images
 
-echo "PASSO 3: Executando o container Docker"
-echo "--------------------------------------------"
+  echo "PASSO 3: Executando o container Docker"
+  echo "--------------------------------------------"
 
-echo "Criando uma rede para containers se verem pelo nome"
-docker network create web-net
+  echo "Criando uma rede para containers se verem pelo nome"
+  docker network create web-net
 
-echo "Executando o container em modo daemon"
-#docker run -d --name nginx_proxy --privileged --network web-net -p 80:80 rpi-nginx:latest
-docker-compose up -d
+  echo "Executando o container em modo daemon"
+  #docker run -d --name nginx_proxy --privileged --network web-net -p 80:80 rpi-nginx:latest
+  docker compose up -d
 
-echo "Verificando se o container está em execução"
-docker ps
+  echo "Verificando se o container está em execução"
+  docker ps
 
-echo "Verificando os logs do container"
-docker logs -f nginx
-docker logs -f webapp
+  echo "Verificando os logs do container"
+  docker logs -f nginx
+  docker logs -f webapp
+else
+    echo "AVISO: Arquivo docker-compose.yml não encontrado. Pulando os passos de build e execução."
+    exit 0
+fi
 
 cat << 'EOF'
 ======================================================================
@@ -125,29 +134,29 @@ Você pode gerenciar o container usando os seguintes comandos:
 # Parar o container
 docker stop flask_app
 ou
-docker-compose stop webapp
+docker compose stop webapp
 ou 
-docker-compose stop
+docker compose stop
 
 # Iniciar o container
 docker start nginx_proxy
 ou
-docker-compose start nginx
+docker compose start nginx
 ou
-docker-compose start
+docker compose start
 
 # Reiniciar o container
 docker restart nginx_prxy
 ou
-docker-compose restart webapp
+docker compose restart webapp
 ou
-docker-compose restart
+docker compose restart
 
 # Remover o container (precisa estar parado)
 docker stop nginx_proxy
 docker rm nginx_proxy
 ou
-docker-compose down
+docker compose down
 
 # Executar o container com reinicialização automática
 docker run -d --name nginx_proxy --privileged --restart unless-stopped -p 80:80 rpi-nginx:latest
