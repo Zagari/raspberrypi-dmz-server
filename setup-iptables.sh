@@ -23,9 +23,18 @@ DEBIAN_FRONTEND=noninteractive apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get install -y iptables-persistent
 
 echo "[2/4] Limpando todas as regras existentes (Flush)..."
-iptables -F # Limpa todas as regras
-iptables -X # Apaga todas as chains não-padrão
-iptables -Z # Zera todos os contadores
+# Primeiro, permita tudo para não se trancar fora durante a execução do script
+sudo iptables -P INPUT ACCEPT
+sudo iptables -P FORWARD ACCEPT
+sudo iptables -P OUTPUT ACCEPT
+# Limpa todas as regras, chains e zera contadores
+sudo iptables -F # Limpa todas as regras
+sudo iptables -X # Apaga todas as chains não-padrão
+sudo iptables -Z # Zera todos os contadores
+sudo iptables -t nat -F
+sudo iptables -t nat -X
+sudo iptables -t mangle -F
+sudo iptables -t mangle -X
 
 echo "[3/4] Definindo as regras do firewall..."
 
@@ -37,6 +46,8 @@ iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
 
 # --- REGRAS DE ACEITAÇÃO (ALLOW) ---
+
+# --- REGRAS PARA PROTEGER O HOST (Chain INPUT) ---
 # Permite tráfego na interface de loopback (essencial para o sistema)
 iptables -A INPUT -i lo -j ACCEPT
 
@@ -49,20 +60,25 @@ iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
 # Permite SSH (porta 22) para que você possa administrar o Pi
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT
 
-# Permite HTTP (porta 80) para o Nginx
-iptables -A INPUT -p tcp --dport 80 -j ACCEPT
-
-# Permite HTTPS (porta 443) para o Nginx
-iptables -A INPUT -p tcp --dport 443 -j ACCEPT
-
-# Permite a porta (8000) para o servidor web personalizado, caso deseje que ele serja acessível externamente
-iptables -A INPUT -p tcp --dport 8000 -j ACCEPT
+# --- REGRAS PARA PROTEGER OS CONTAINERS DOCKER (Chain DOCKER-USER) ---
+echo "--> Adicionando regras para os Containers Docker na chain DOCKER-USER..."
+# Permite conexões estabelecidas retornarem aos containers
+sudo iptables -A DOCKER-USER -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+# Permite acesso externo à porta 80 (HTTP) dos containers
+sudo iptables -A DOCKER-USER -p tcp --dport 80 -j ACCEPT
+# Permite acesso externo à porta 443 (HTTPS) dos containers
+sudo iptables -A DOCKER-USER -p tcp --dport 443 -j ACCEPT
+# Permite acesso externo à porta 8000 dos containers
+sudo iptables -A DOCKER-USER -p tcp --dport 8000 -j ACCEPT
 
 # Se você precisar de outras portas, como a porta do Minecraft (25565), adicione aqui:
-# iptables -A INPUT -p tcp --dport 25565 -j ACCEPT
+# iptables -A DOCKER-USER -p tcp --dport 25565 -j ACCEPT
 
 echo "[4/4] Salvando as regras para persistirem após o reboot..."
 # O iptables-persistent usa este comando para salvar as regras
+# Cria o diretório se não existir
+sudo mkdir -p /etc/iptables
+# Salva as regras
 iptables-save > /etc/iptables/rules.v4
 
 echo ""
