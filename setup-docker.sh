@@ -7,7 +7,9 @@ set -e
 echo "Instalação do Docker e execução do container no Raspberry Pi 2"
 echo "======================================================================"
 echo "Execute este script no seu Raspberry Pi 2 para configurar o Docker e executar o container."
-input("Pressione Enter para continuar...")
+
+echo "Pressione Enter para continuar..."
+read
 
 if [ "$(id -u)" -ne 0 ]; then
     echo "Este script precisa ser executado como root. Use 'sudo' para executar."
