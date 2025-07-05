@@ -61,6 +61,15 @@ iptables -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT
 
 # --- REGRAS PARA PROTEGER OS CONTAINERS DOCKER (Chain DOCKER-USER) ---
+# Verifica se a chain DOCKER-USER existe e, se não, a cria.
+# O '-N' cria uma nova chain. O '|| true' engole o erro se a chain já existir.
+sudo iptables -N DOCKER-USER || true
+
+# Garante que o tráfego da FORWARD seja enviado para DOCKER-USER.
+# Esta é a regra mais importante. O Docker faria isso, mas nós fazemos para garantir.
+# Usamos '-C' para checar se a regra já existe, e '||' para adicioná-la se não existir.
+sudo iptables -C FORWARD -j DOCKER-USER -o docker0 &>/dev/null || sudo iptables -I FORWARD -j DOCKER-USER -o docker0
+
 echo "--> Adicionando regras para os Containers Docker na chain DOCKER-USER..."
 # Permite conexões estabelecidas retornarem aos containers
 sudo iptables -A DOCKER-USER -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
