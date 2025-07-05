@@ -3,7 +3,8 @@
 backup/
 
 # Arquivos de Certificados
-nginx/certs/
+nginx/certs/*
+!nginx/certs/.gitkeep
 
 # Arquivos de Imagens Docker salvas
 *.tar

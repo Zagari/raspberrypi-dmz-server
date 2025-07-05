@@ -14,7 +14,7 @@ nginx \
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copie a config customizada do nginx
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./conf.d/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copiar os certificados para a imagem, se desejar
 COPY ./certs/ /etc/nginx/certs/
