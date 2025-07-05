@@ -20,8 +20,7 @@ COPY ./conf.d/nginx.conf /etc/nginx/conf.d/default.conf
 COPY ./certs/ /etc/nginx/certs/
 
 # Definir permissões seguras para os certificados
-RUN chmod 600 /etc/nginx/certs/*.pem && \
-    chmod 600 /etc/nginx/certs/*.key
+RUN find /etc/nginx/certs -type f \( -name "*.pem" -o -name "*.key" \) -exec chmod 600 {} \;
 
 # Expor as portas 80 (HTTP), 443 (HTTPS) e 8000 (custom)
 EXPOSE 80
