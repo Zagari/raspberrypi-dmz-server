@@ -37,7 +37,7 @@ echo "### Se o container estiver parado, inicie-o"
 cat << 'EOF'
 docker start nginx_proxy
 ou
-docker start webapp
+docker start flask_app
 EOF
 pause_for_user
 
@@ -45,15 +45,15 @@ echo "PASSO 2: Verificar os logs do container"
 echo "---------------------------------------"
 echo "### Visualizar os logs do container nginx_proxy"
 docker logs nginx_proxy
-echo "### Visualizar os logs do container webapp (se aplicável)"
-docker logs webapp
+echo "### Visualizar os logs do container flask_app (se aplicável)"
+docker logs flask_app
 pause_for_user
 echo "### Acompanhar os logs em tempo real"
 cat << 'EOF'
 # Acompanhar os logs do container nginx_proxy em tempo real
 docker logs -f nginx_proxy
-# Acompanhar os logs do container webapp em tempo real (se aplicável)
-docker logs -f webapp
+# Acompanhar os logs do container flask_app em tempo real (se aplicável)
+docker logs -f flask_app
 EOF
 pause_for_user
 
