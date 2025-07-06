@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zagari's Home App</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="static/images/logo.png" alt="Zagari's Home App Logo" class="logo">
+            </div>
+            <div class="title-container">
+                <h1>Zagari's Home App</h1>
+                <!-- <p class="subtitle">Hub de Projetos Inovadores</p> -->
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="card-header deepknow">
+                    <i class="project-icon fas fa-brain"></i>
+                </div>
+                <div class="card-body">
+                    <h2 class="project-title">DeepKnow.AI</h2>
+                    <p class="project-description">
+                        Sistema de Intelligent Analytics com recursos avançados de processamento de dados e insights baseados em inteligência artificial.
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a href="/deepknow" class="project-link">Em breve</a>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="card-header tax-calculator">
+                    <i class="project-icon fas fa-chart-line"></i>
+                </div>
+                <div class="card-body">
+                    <h2 class="project-title">Equities Tax Calculator</h2>
+                    <p class="project-description">
+                        Ferramenta especializada para cálculo de impostos sobre operações de renda variável, com suporte a diversos tipos de ativos.
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a href="/tax-calculator" class="project-link">Em breve</a>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="card-header book-bazaar">
+                    <i class="project-icon fas fa-book"></i>
+                </div>
+                <div class="card-body">
+                    <h2 class="project-title">Bazar de Livros</h2>
+                    <p class="project-description">
+                        Bot de WhatsApp para facilitar a compra e venda de livros usados, conectando leitores e promovendo a economia circular.
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a href="/bazar/health" class="project-link">Acessar</a>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="card-header smart-recipes">
+                    <i class="project-icon fas fa-utensils"></i>
+                </div>
+                <div class="card-body">
+                    <h2 class="project-title">Receitas Inteligentes</h2>
+                    <p class="project-description">
+                        Livro digital de receitas culinárias com recomendações personalizadas por inteligência artificial baseadas nas suas preferências.
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <a href="/smart-recipes" class="project-link">Em breve</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; <script>document.write(new Date().getFullYear())</script> Castellabate Tech. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        // Script para substituir URL base por variável de ambiente
+        document.addEventListener('DOMContentLoaded', function() {
+            const baseUrl = window.BASE_URL || 'castellabate.tech';
+            
+            // Atualizar href dos links com base na URL
+            const projectLinks = document.querySelectorAll('.project-link');
+            projectLinks.forEach(link => {
+                const path = link.getAttribute('href');
+                // Decide entre subdomínio ou subpasta
+                const useSubdomain = false; // Alternar para true se preferir subdomínios
+                
+                if (useSubdomain) {
+                    // Formato de subdomínio: projeto.dominio.com
+                    const subdomain = path.replace('/', '');
+                    link.setAttribute('href', `http://${subdomain}.${baseUrl}`);
+                } else {
+                    // Formato de subpasta: dominio.com/projeto
+                    link.setAttribute('href', `http://${baseUrl}${path}`);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

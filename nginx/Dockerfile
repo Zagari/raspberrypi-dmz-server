@@ -13,11 +13,19 @@ nginx \
 # Remove a configuração padrão
 RUN rm /etc/nginx/conf.d/default.conf
 
+# Copiar arquivos HTML e assets
+COPY index.html static/styles.css /usr/share/nginx/html/
+COPY static/images/logo.png /usr/share/nginx/html/images/
+
+# Garante permissões de leitura para os arquivos estáticos
+RUN chmod -R 755 /usr/share/nginx/html
+
 # Copie a config customizada do nginx
 COPY ./conf.d/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copiar os certificados para a imagem, se desejar
 COPY ./certs/ /etc/nginx/certs/
+
 
 # Definir permissões seguras para os certificados
 RUN find /etc/nginx/certs -type f \( -name "*.pem" -o -name "*.key" \) -exec chmod 600 {} \;

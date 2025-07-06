@@ -28,6 +28,10 @@ services:
       - ./nginx/certs:/etc/nginx/certs:ro
       # Mapeia o diretório de logs do Nginx
       - ./nginx/logs:/var/log/nginx
+      # Mapeia o diretório de html do Nginx
+      - ./nginx/html:/usr/share/nginx/html
+      # Mapeia o diretório de imagens do Nginx
+      - ./nginx/images:/usr/share/nginx/images
     networks:
       - web-net
     depends_on:
