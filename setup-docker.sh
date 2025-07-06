@@ -122,8 +122,8 @@ if [ -f "docker-compose.yml" ]; then
   docker ps
 
   echo "### Verificando os logs do container"
-  docker logs -f nginx
-  docker logs -f webapp
+  docker logs -f nginx_proxy
+  docker logs -f flask_app
 else
     echo "### ### AVISO: Arquivo docker-compose.yml não encontrado. Pulando os passos de build e execução."
     exit 0
