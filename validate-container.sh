@@ -63,20 +63,6 @@ echo "### Verificar o status do firewall"
 sudo iptables -L -n
 pause_for_user
 
-echo "### Verificar se o firewall está ativo"
-if sudo systemctl is-active --quiet iptables; then
-    echo "O firewall está ativo."
-else
-    echo "O firewall não está ativo. Iniciando o serviço..."
-    sudo systemctl start iptables
-    if sudo systemctl is-active --quiet iptables; then
-        echo "O firewall foi iniciado com sucesso."
-    else
-        echo "Falha ao iniciar o firewall. Verifique os logs do sistema."
-        sudo journalctl -u iptables
-        exit 1
-    fi
-fi
 echo "### Listar as regras de firewall ativas"
 sudo iptables -L -n -v
 
