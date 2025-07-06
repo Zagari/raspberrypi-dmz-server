@@ -1,85 +1,136 @@
 #!/bin/bash
 
 # Script para validar o funcionamento da imagem e do container no Raspberry Pi 2
-echo "Instruções para validar o funcionamento da imagem e do container no Raspberry Pi 2"
+pause_for_user() {
+   echo "Pressione [ENTER] para continuar ou [ESC] para interromper..."
+   while true; do
+       IFS= read -rsn1 key
+       if [[ $key == "" ]]; then
+            break
+       elif [[ $key == $'\e' ]]; then
+            echo "Interrompido pelo usuário."
+            exit 1
+       fi
+   done
+   echo ""
+}
+
+echo "Validando o funcionamento da imagem e do container no Raspberry Pi 2"
 echo "=============================================================================="
 echo ""
-echo "Este script contém instruções para validar se tudo está funcionando corretamente."
+echo "Este script executa algumas instruções para você validar se tudo está funcionando corretamente."
 echo ""
 
-cat << 'EOF'
-PASSO 1: Verificar se o container está em execução
--------------------------------------------------
-# Verificar o status do container
+echo "PASSO 1: Verificar se o container está em execução"
+echo "--------------------------------------------------"
+echo "### Verificar o status do container"
 docker ps
 
-# Se o container não estiver listado, verifique todos os containers (incluindo os parados)
+pause_for_user
+
+echo "### Se o container não estiver listado, verifique todos os containers (incluindo os parados)"
 docker ps -a
 
-# Se o container estiver parado, inicie-o
-docker start firewall-server
+pause_for_user
 
-PASSO 2: Verificar os logs do container
--------------------------------------
-# Visualizar os logs do container
-docker logs firewall-server
+echo "### Se o container estiver parado, inicie-o"
+echo << 'EOF' 
+docker start nginx_proxy
+ou
+docker start webapp
+EOF
+pause_for_user
 
-# Acompanhar os logs em tempo real
-docker logs -f firewall-server
+echo "PASSO 2: Verificar os logs do container"
+echo "---------------------------------------"
+echo "### Visualizar os logs do container nginx_proxy"
+docker logs nginx_proxy
+echo "### Visualizar os logs do container webapp (se aplicável)"
+docker logs webapp
+pause_for_user
+echo "### Acompanhar os logs em tempo real"
+echo << 'EOF' 
+# Acompanhar os logs do container nginx_proxy em tempo real
+docker logs -f nginx_proxy
+# Acompanhar os logs do container webapp em tempo real (se aplicável)
+docker logs -f webapp
+EOF
+pause_for_user
 
-PASSO 3: Verificar o status do firewall
--------------------------------------
-# Verificar o status do UFW dentro do container
-docker exec firewall-server iptables -L -n
+echo "PASSO 3: Verificar o status do firewall"
+echo "---------------------------------------"
+echo "### Verificar o status do firewall"
+sudo iptables -L -n
+pause_for_user
 
-# Verificar as regras de firewall ativas
-docker exec firewall-server iptables -L -n -v
+echo "### Verificar se o firewall está ativo"
+if sudo systemctl is-active --quiet iptables; then
+    echo "O firewall está ativo."
+else
+    echo "O firewall não está ativo. Iniciando o serviço..."
+    sudo systemctl start iptables
+    if sudo systemctl is-active --quiet iptables; then
+        echo "O firewall foi iniciado com sucesso."
+    else
+        echo "Falha ao iniciar o firewall. Verifique os logs do sistema."
+        sudo journalctl -u iptables
+        exit 1
+    fi
+fi
+echo "### Listar as regras de firewall ativas"
+sudo iptables -L -n -v
 
+echo "PASSO 4: Testar o acesso ao servidor web"
+echo "----------------------------------------"
 
-PASSO 4: APENAS se tiver colocado um servidor nginx/web na imagem, testar o acesso ao servidor web
---------------------------------------
-# Se tiver colocado um Ngnix na imagem, verifique se há erros nos logs do Nginx dentro do container
-docker exec firewall-server cat /var/log/nginx/error.log
+echo "### Verifique se há erros nos logs do Nginx dentro do container"
+docker exec nginx_proxy cat /var/log/nginx/error.log
+pause_for_user
 
-# No Raspberry Pi, teste o acesso local
+echo "### No Raspberry Pi, teste o acesso local"
 curl http://localhost
+pause_for_user
 
+echo << 'EOF'
 # Em outro dispositivo na mesma rede, abra um navegador e acesse:
 http://IP_DO_RASPBERRY
 
 # Verifique se a página web é carregada corretamente e se o uptime é exibido
+EOF
+pause_for_user
 
-# Testar o endpoint de uptime (por exemplo, um endpoint CGI que retorna o uptime do sistema)
-# curl http://IP_DO_RASPBERRY/uptime
+echo "PASSO 5: Verificar o uso de recursos"
+echo "------------------------------------"
+echo "### Verificar o uso de CPU e memória do container"
+docker stats nginx_proxy --no-stream
+pause_for_user
 
-# Deve retornar o uptime do sistema no formato "up X days, Y hours, Z minutes"
+echo "### Verificar o uso de disco dentro do container"
+docker exec nginx_proxy df -h
+pause_for_user
 
-PASSO 5: Verificar o uso de recursos
-----------------------------------
-# Verificar o uso de CPU e memória do container
-docker stats firewall-server --no-stream
-
-# Verificar o uso de disco
-docker exec firewall-server df -h
-
+echo << 'EOF'
 PASSO 6: Testar a persistência após reinicialização
--------------------------------------------------
-# Reiniciar o Raspberry Pi
+---------------------------------------------------
+### Reiniciar o Raspberry Pi para verificar a persistência do container
 sudo reboot
 
-# Após a reinicialização, verificar se o container iniciou automaticamente
+### Após a reinicialização, verificar se o container iniciou automaticamente
 docker ps
 
-# Se não iniciou automaticamente, verifique se o Docker está em execução
+### Se não iniciou automaticamente, verifique se o Docker está em execução
 sudo systemctl status docker
 
-# Inicie o container com a flag de reinicialização automática
-docker run -d --name firewall-server --privileged --restart unless-stopped --network web-net -p 80:80 rpi-ubuntu-iptables:latest
+### Inicie o container com a flag de reinicialização automática
+docker run -d --name nginx_proxy --privileged --restart unless-stopped --network web-net -p 80:80 raspberrypi-dmz-server-nginx:latest
+EOF
+pause_for_user
 
+echo << 'EOF'
 PASSO 7: Solução de problemas comuns
 ----------------------------------
 1. Se o container não iniciar:
-   - Verifique os logs: docker logs firewall-server
+   - Verifique os logs: docker logs nginx_proxy
    - Verifique se há conflitos de porta: netstat -tuln | grep 80
    - Verifique se há espaço em disco suficiente: df -h
 
@@ -89,14 +140,9 @@ PASSO 7: Solução de problemas comuns
 #   - Teste o acesso local dentro do container: docker exec -it nginx-server curl localhost
 
 3. Se o firewall estiver bloqueando conexões:
-   - Verifique as regras do Iptables: docker exec firewall-server iptables -L -n -v || echo "iptables não está disponível ou falhou"
-   - Ajuste as regras se necessário: docker exec firewall-server iptables -A INPUT -p tcp --dport 8080 -j ACCEPT
-
-#4. Se o CGI não funcionar:
-#   - Verifique se o fcgiwrap está em execução: docker exec nginx-server service fcgiwrap status
-#   - Verifique as permissões do script: docker exec nginx-server ls -la /usr/lib/cgi-bin/uptime.sh
+   - Verifique as regras do Iptables: docker exec nginx_proxy iptables -L -n -v || echo "iptables não está disponível ou falhou"
+   - Ajuste as regras se necessário: docker exec nginx_proxy iptables -A INPUT -p tcp --dport 8080 -j ACCEPT
 EOF
 
 echo ""
-echo "Siga estas instruções para validar o funcionamento do container no Raspberry Pi 2."
 echo "Se tudo estiver funcionando corretamente, você terá um servidor web com firewall rodando em um container Docker no seu Raspberry Pi 2."

@@ -19,50 +19,50 @@ fi
 echo "PASSO 1: Instalar o Docker no Raspberry Pi 2"
 echo "-------------------------------------------"
 
-echo "Atualizando o sistema..."
+echo "### Atualizando o sistema..."
 sudo apt-get update
 sudo apt-get upgrade -y
 
-echo "Instalando dependências..."
+echo "### Instalando dependências..."
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common lsb-release
 
-echo "Adicionando a chave GPG oficial do Docker"
+echo "### Adicionando a chave GPG oficial do Docker"
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/raspbian/gpg -o /etc/apt/keyrings/docker.asc
 chmod a+r /etc/apt/keyrings/docker.asc
 
-echo "Adicionando o repositório do Docker para Raspbian..."
+echo "### Adicionando o repositório do Docker para Raspbian..."
 # Para Raspberry Pi OS baseado em Debian Bookworm (ou Bullseye):
 echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/raspbian \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-echo "Atualizando a lista de pacotes"
+echo "### Atualizando a lista de pacotes"
 sudo apt-get update
 
-echo "Instalando o Docker Engine e o Docker Compose..."
+echo "### Instalando o Docker Engine e o Docker Compose..."
 # Adicionamos 'docker-compose-plugin' para instalar o Docker Compose V2
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-echo "Adicionando o usuário atual ao grupo docker (para executar Docker sem sudo)"
+echo "### Adicionando o usuário atual ao grupo docker (para executar Docker sem sudo)"
 sudo usermod -aG docker $USER
 
-echo "Iniciando e habilitando o serviço Docker"
+echo "### Iniciando e habilitando o serviço Docker"
 sudo systemctl enable docker
 sudo systemctl restart docker
 
-echo "Verificando se o Docker está funcionando"
+echo "### Verificando se o Docker está funcionando"
 docker --version
 docker compose version # Note o comando 'docker compose' sem hífen
 
 
-echo "Docker e Docker Compose instalados com sucesso!"
+echo "### Docker e Docker Compose instalados com sucesso!"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 echo "!! IMPORTANTE: Faça logout e login novamente para usar      !!"
 echo "!! o Docker sem 'sudo', ou execute 'newgrp docker'        !!"
 echo "!! em um novo terminal para aplicar as permissões agora.  !!"
 echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-echo "Pressione Enter para continuar com o resto do script..."
+echo "### Pressione Enter para continuar com o resto do script..."
 read
 
 cat << 'EOF'
@@ -96,31 +96,31 @@ EOF
 # Certifique-se de que existe um arquivo docker-compose.yml no diretório atual
 
 if [ -f "docker-compose.yml" ]; then
-  echo "Construindo a imagem Docker diretamente no Raspberry Pi com docker compose"
+  echo "### Construindo a imagem Docker diretamente no Raspberry Pi com docker compose"
   docker compose build
 
   echo "-----------------------------------------------------------------------"
-  echo "Verificando se a imagem foi carregada ou criada corretamente"
+  echo "### Verificando se a imagem foi carregada ou criada corretamente"
   docker images
 
   echo "PASSO 3: Executando o container Docker"
   echo "--------------------------------------------"
 
-  echo "Criando uma rede para containers se verem pelo nome"
+  echo "### Criando uma rede para containers se verem pelo nome"
   docker network create web-net
 
-  echo "Executando o container em modo daemon"
+  echo "### Executando o container em modo daemon"
   #docker run -d --name nginx_proxy --privileged --network web-net -p 80:80 rpi-nginx:latest
   docker compose up -d
 
-  echo "Verificando se o container está em execução"
+  echo "### Verificando se o container está em execução"
   docker ps
 
-  echo "Verificando os logs do container"
+  echo "### Verificando os logs do container"
   docker logs -f nginx
   docker logs -f webapp
 else
-    echo "AVISO: Arquivo docker-compose.yml não encontrado. Pulando os passos de build e execução."
+    echo "### ### AVISO: Arquivo docker-compose.yml não encontrado. Pulando os passos de build e execução."
     exit 0
 fi
 
@@ -181,4 +181,4 @@ EOF
 
 echo ""
 echo
-echo "Agora você poderá acessar o servidor web através do IP do Raspberry Pi."
+echo "### Agora você poderá acessar o servidor web através do IP do Raspberry Pi."

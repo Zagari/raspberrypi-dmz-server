@@ -40,15 +40,15 @@ raspberrypi-dmz-server/
 
 ## Passo a Passo
 
-### 1. Construir a Imagem Docker
+### 1. [Opcional[ Construir a Imagem Docker Manualmente
 
-No seu computador ou no Raspberry Pi, execute:
+O projeto agora tem um docker compose que já orquestra a construção das imagens e containers, mas caso queira testar a construção de algum das imagens, edite apropriadamente os parametros de build-image.sh e o copie para dentro da pasta da aplicação que deseja. Depois, no seu computador ou no Raspberry Pi, execute:
 
 ```bash
 ./build-image.sh
 ```
 
-Este script irá construir a imagem Docker. Se for executado no seu host, ele irá salvá-la como `rpi-ubuntu-iptables.tar` para ser copiada posteriormente para o Raspberry Pi 2.
+Este script irá construir a imagem Docker. Se for executado no seu host, ele irá salvá-la como `<NOME>.tar` para ser copiada posteriormente para o Raspberry Pi 2.
 
 ### 2. Preparar o Cartão SD
 
