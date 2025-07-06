@@ -106,8 +106,13 @@ if [ -f "docker-compose.yml" ]; then
   echo "PASSO 3: Executando o container Docker"
   echo "--------------------------------------------"
 
+
   echo "### Criando uma rede para containers se verem pelo nome"
-  docker network create web-net
+  if ! docker network ls --format '{{.Name}}' | grep -q '^web-net$'; then
+    docker network create web-net
+  else
+    echo "### A rede 'web-net' já existe. Pulando a criação."
+  fi
 
   echo "### Executando o container em modo daemon"
   #docker run -d --name nginx_proxy --privileged --network web-net -p 80:80 rpi-nginx:latest
