@@ -34,7 +34,7 @@ docker ps -a
 pause_for_user
 
 echo "### Se o container estiver parado, inicie-o"
-echo << 'EOF' 
+cat << 'EOF'
 docker start nginx_proxy
 ou
 docker start webapp
@@ -49,7 +49,7 @@ echo "### Visualizar os logs do container webapp (se aplicável)"
 docker logs webapp
 pause_for_user
 echo "### Acompanhar os logs em tempo real"
-echo << 'EOF' 
+cat << 'EOF'
 # Acompanhar os logs do container nginx_proxy em tempo real
 docker logs -f nginx_proxy
 # Acompanhar os logs do container webapp em tempo real (se aplicável)
@@ -91,7 +91,7 @@ echo "### No Raspberry Pi, teste o acesso local"
 curl http://localhost
 pause_for_user
 
-echo << 'EOF'
+cat << 'EOF'
 # Em outro dispositivo na mesma rede, abra um navegador e acesse:
 http://IP_DO_RASPBERRY
 
@@ -109,7 +109,7 @@ echo "### Verificar o uso de disco dentro do container"
 docker exec nginx_proxy df -h
 pause_for_user
 
-echo << 'EOF'
+cat << 'EOF'
 PASSO 6: Testar a persistência após reinicialização
 ---------------------------------------------------
 ### Reiniciar o Raspberry Pi para verificar a persistência do container
@@ -126,7 +126,7 @@ docker run -d --name nginx_proxy --privileged --restart unless-stopped --network
 EOF
 pause_for_user
 
-echo << 'EOF'
+cat << 'EOF'
 PASSO 7: Solução de problemas comuns
 ----------------------------------
 1. Se o container não iniciar:
