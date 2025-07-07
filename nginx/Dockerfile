@@ -14,11 +14,13 @@ nginx \
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copiar arquivos HTML e assets
-COPY html/index.html static/styles.css /usr/share/nginx/html/
-COPY static/images/logo.png /usr/share/nginx/html/images/
+COPY html/index.html html/styles.css /usr/share/nginx/html/
+RUN mkdir -p /usr/share/nginx/images
+COPY images/logo.png /usr/share/nginx/images/
 
 # Garante permissões de leitura para os arquivos estáticos
 RUN chmod -R 755 /usr/share/nginx/html
+RUN chmod -R 755 /usr/share/nginx/images
 
 # Copie a config customizada do nginx
 COPY ./conf.d/nginx.conf /etc/nginx/conf.d/default.conf
