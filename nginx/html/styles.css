@@ -1,8 +1,8 @@
 :root {
-    --primary-color: #0077B5;
-    --secondary-color: #00A0DC;
-    --accent-color: #313335;
-    --tertiary-color: #5851DB;
+    --primary-color: #4895ef;
+    --secondary-color: #4cc9f0;
+    --accent-color: #3a0ca3;
+    --tertiary-color: #7209b7;
     --light-color: #f8f9fa;
     --dark-color: #212529;
     --transition: all 0.3s ease;
@@ -30,6 +30,7 @@ header {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* CSS para estilizar o cabeçalho com logo */
 .header-container {
     display: flex;
     align-items: center;
@@ -46,15 +47,16 @@ header {
 }
 
 .logo {
-    height: 60px;
+    height: 60px; /* Ajuste conforme o tamanho desejado */
     width: auto;
-    border-radius: 8px;
+    border-radius: 8px; /* Opcional: para arredondar os cantos da imagem */
 }
 
 .title-container {
-    text-align: left;
+    text-align: left; /* Alinha o texto à esquerda quando está ao lado do logo */
 }
 
+/* Para responsividade em telas menores */
 @media (max-width: 768px) {
     .header-container {
         flex-direction: column;
@@ -65,24 +67,15 @@ header {
         text-align: center;
     }
     
+    .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
     h1 {
         font-size: 2rem;
     }
-    
-    .input-container {
-        flex-direction: column;
-    }
-    
-    .generate-button {
-        margin-top: 1rem;
-        width: 100%; /* Make button full width on small screens if stacked */
-    }
-    /* Ensure textarea takes full width if button is also full width and stacked */
-    #topic-input {
-        width: 100%;
-    }
 }
-
 
 .container {
     width: 90%;
@@ -102,190 +95,97 @@ h1 {
     opacity: 0.8;
 }
 
-.input-section {
-    margin: 3rem 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.input-container {
-    width: 100%;
-    max-width: 800px;
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start; /* Align button to top of textarea */
-}
-
-#topic-input {
-    flex: 1;
-    height: 120px; /* Or min-height if you prefer */
-    padding: 1rem;
-    border: 2px solid #ddd;
-    border-radius: 12px;
-    font-size: 1rem;
-    resize: vertical;
-    transition: var(--transition);
-}
-
-#topic-input:focus {
-    outline: none;
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 0 4px rgba(0, 160, 220, 0.2);
-}
-
-.generate-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    height: 60px; /* Match typical button height or desired size */
-    width: 60px;  /* Make it a square for a circle */
-    border-radius: 50%; /* For a circular button */
-    font-size: 1.5rem; /* Adjust icon size */
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    flex-shrink: 0; /* Prevent button from shrinking */
-}
-
-
-.generate-button:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-.input-helper {
-    margin-top: 0.75rem;
-    color: #666;
-    font-size: 0.9rem;
-    text-align: center;
-}
-
-.results-section {
-    margin-top: 2rem;
-    opacity: 1;
-    transform: translateY(0);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.results-section.hidden {
-    /* display: none; */ /* We use the .hidden utility class for display:none */
-    opacity: 0;
-    transform: translateY(20px);
-}
-
-.results-header {
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.results-header h2 {
-    color: var(--primary-color);
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.results-header p {
-    color: #555;
-}
-
-.posts-container,
-.plan-container, /* Added plan-container for consistency if it holds cards */
-.parallel-posts-container {
+.projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-top: 1rem; /* Added for spacing if header is present */
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.6rem;
+    margin-top: 3rem;
 }
 
-.post-card {
+.project-card {
     background-color: white;
     border-radius: 12px;
-    padding: 1.5rem;
+    overflow: hidden;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     transition: var(--transition);
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
-.post-card:hover {
-    transform: translateY(-5px);
+.project-card:hover {
+    transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
-.post-card h3 {
-    color: var(--accent-color);
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 0.75rem;
-}
-
-.post-content {
-    flex: 1;
-    margin-bottom: 1.5rem;
-}
-
-.post-content p {
-    color: #333;
-    line-height: 1.6;
-    white-space: pre-line; /* Preserve line breaks from markdown */
-}
-
-.post-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: auto; /* Pushes actions to the bottom of the card */
-}
-
-.post-actions button {
-    flex: 1;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
+.card-header {
+    height: 180px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    transition: var(--transition);
+    padding: 2rem;
 }
 
-.copy-btn {
-    background-color: var(--tertiary-color);
+.project-icon {
+    font-size: 5rem;
     color: white;
 }
 
-.copy-btn:hover {
-    background-color: #4a46c2; /* Darken tertiary color */
+.card-body {
+    padding: 1.5rem;
+    flex: 1;
 }
 
-.edit-btn { /* Assuming there might be an edit button */
-    background-color: #e9ecef;
-    color: #495057;
+.project-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark-color);
 }
 
-.edit-btn:hover {
-    background-color: #dee2e6;
+.project-description {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
 }
 
-/* Estilos para o indicador de carregamento (duplicação removida mais abaixo) */
-/* .loading-container ... */
-/* .loading-spinner ... */
-/* @keyframes spin ... */
+.card-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #eee;
+}
 
-/* Estilos para mensagens de erro (duplicação removida mais abaixo) */
-/* .error-container ... */
-/* .retry-button ... */
+.project-link {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: var(--transition);
+    text-align: center;
+    width: 100%;
+}
 
-/* Efeito visual para botão de cópia */
-.copy-btn.copied {
-    background-color: #28a745; /* Green for success */
+.project-link:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Cores específicas para cada projeto */
+.deepknow {
+    background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%);
+}
+
+.tax-calculator {
+    background: linear-gradient(135deg, #7209b7 0%, #b5179e 100%);
+}
+
+.book-bazaar {
+    background: linear-gradient(135deg, #f72585 0%, #ff4d6d 100%);
+}
+
+.smart-recipes {
+    background: linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%);
 }
 
 footer {
@@ -293,322 +193,5 @@ footer {
     color: white;
     text-align: center;
     padding: 1.5rem 0;
-    margin-top: auto; /* Ensures footer is at the bottom */
+    margin-top: auto;
 }
-
-/* Estilo para o card consolidado */
-.consolidated-card { /* Already styled as post-card, this can be for specific overrides if needed */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Existing shadow */
-    border-radius: 8px; /* Existing radius */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Existing transition */
-}
-
-.consolidated-card:hover {
-    transform: translateY(-5px); /* Existing hover effect */
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Existing hover effect */
-}
-
-.consolidated-content { /* This is similar to post-content */
-    padding: 10px; /* Or use existing post-content padding */
-}
-
-.content-section {
-    margin-bottom: 10px;
-}
-
-.content-section h4 {
-    color: #0077b5; /* var(--primary-color) */
-    margin-bottom: 8px;
-    font-size: 18px;
-}
-
-.content-divider {
-    border: 0;
-    height: 1px;
-    background: #e0e0e0;
-    margin: 15px 0;
-}
-
-/* Estilo para o container da barra de progresso */
-.progress-bar-container {
-    width: 100%;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    margin: 20px 0;
-    overflow: hidden;
-    height: 20px;
-    position: relative;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-    transition: all 0.3s ease; /* Added transition */
-}
-
-/* Estilo para a barra de progresso */
-.progress-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); /* Using CSS variables */
-    border-radius: 5px; /* Ensure inner bar also has radius if container does */
-    width: 0%; /* Start at 0% */
-    transition: width 0.5s ease; /* Smooth transition for width change */
-    position: relative; /* For pseudo-elements like ::after */
-}
-
-/* Estilo para o texto de status */
-#progress-status {
-    text-align: center;
-    margin-top: 5px;
-    font-size: 0.9em;
-    color: #555;
-}
-
-/* Animação de pulso para a barra de progresso */
-@keyframes pulse {
-    0% { opacity: 0.8; }
-    50% { opacity: 1; }
-    100% { opacity: 0.8; }
-}
-
-.progress-bar::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    animation: pulse 1.5s infinite;
-}
-
-
-/* Estilo para a seção de atualizações de status */
-.status-updates {
-    margin-top: 20px;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #f8f9fa; /* var(--light-color) */
-    max-height: 150px;
-    overflow-y: auto;
-    border: 1px solid #e9ecef;
-}
-
-/* Estilo para mensagens de status */
-.status-message {
-    padding: 8px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    background-color: #e9f5fe; /* Light blue, adjust as needed */
-    color: #0070b3; /* Darker blue text */
-    font-size: 0.9em;
-    display: flex;
-    align-items: center;
-    animation: fadeIn 0.3s ease;
-}
-
-/* Animação para mensagens de status */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.status-message i { /* For icons in status messages */
-    margin-right: 8px;
-    font-size: 1em; /* Match text size or slightly larger */
-}
-
-
-/* Classe utilitária para esconder elementos */
-.hidden {
-    display: none !important;
-}
-
-/* Unified Estilo para o estado de carregamento */
-.loading-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem; /* Increased padding */
-    text-align: center;
-    grid-column: 1 / -1; /* Span all columns if in a grid */
-}
-
-/* Unified Spinner de carregamento */
-.loading-spinner {
-    width: 50px; /* Increased size */
-    height: 50px; /* Increased size */
-    border: 5px solid rgba(0, 119, 181, 0.2); /* var(--primary-color) with alpha */
-    border-radius: 50%;
-    border-top-color: var(--primary-color);
-    animation: spin 1s linear infinite;
-    margin-bottom: 1rem; /* Increased margin */
-}
-
-@keyframes spin { /* Ensure only one @keyframes spin definition */
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.loading-container p {
-    color: #555;
-    font-size: 1.1rem;
-}
-
-
-/* Unified Estilo para o container de erro */
-.error-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Center content */
-    padding: 2rem; /* Increased padding */
-    background-color: #fff5f5; /* Lighter red */
-    border-radius: 12px; /* Softer radius */
-    border: 1px solid #ffcccc; /* Lighter border */
-    grid-column: 1 / -1; /* Span all columns if in a grid */
-    text-align: center; /* Center text */
-    color: #dc3545; /* Error text color */
-}
-
-.error-container i {
-    font-size: 2.5rem; /* Larger icon */
-    color: #dc3545; /* Error icon color */
-    margin-bottom: 1rem;
-}
-
-.error-container p {
-    color: #333; /* Darker text for readability */
-    margin-bottom: 1rem;
-}
-
-
-/* Unified Botão de tentar novamente */
-.retry-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem; /* More padding */
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: var(--transition);
-    margin-top: 1rem; /* Added margin */
-}
-
-.retry-button:hover {
-    background-color: var(--secondary-color);
-}
-
-/* Styles for new sections */
-#plan-generation-section,
-#parallel-posts-section {
-    margin-top: 3rem; /* More spacing between major sections */
-    padding-top: 1rem; /* Padding for visual separation */
-    border-top: 1px solid #ddd; /* Separator line */
-}
-.empty-results {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-    font-size: 1.1rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px dashed #ddd;
-}
-.empty-results i {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-    display: block;
-    color: var(--primary-color);
-}
-
-
-/* Style for placeholders for loading individual parallel posts */
-.post-card-placeholder {
-    background-color: #f8f9fa;
-    border: 1px dashed #ddd;
-    border-radius: 12px;
-    padding: 1.5rem;
-    min-height: 200px; /* Adjusted height */
-    display: flex;
-    flex-direction: column; /* Stack spinner and text */
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #666;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-}
-.post-card-placeholder .loading-spinner { /* Reuse existing spinner but can customize size if needed */
-    width: 40px;
-    height: 40px;
-    border-width: 4px;
-    margin-bottom: 0.75rem; /* Space between spinner and text */
-}
-.post-card-placeholder p {
-    font-size: 1rem;
-}
-.error-message {
-    color: #dc3545; /* Red color for error messages within cards */
-    font-weight: 500;
-}
-
-.parallel-posts-container {
-    display: flex;
-    gap: 1.5rem; /* Espaçamento entre os cards */
-    flex-wrap: wrap; /* Para responsividade em telas menores */
-    margin-top: 1rem; /* Espaço acima dos cards paralelos */
-}
-
-/* Cada slot que conterá um post-card ou um error-container inline */
-.parallel-posts-container > div { 
-    flex: 1 1 40%; /* Tenta ocupar ~45-50% da largura, permitindo quebra para 2 colunas */
-    min-width: 300px; /* Largura mínima antes de quebrar para uma única coluna */
-    /* O estilo do card (.post-card) ou do erro (.error-container.inline-error)
-       será aplicado ao conteúdo dentro destes divs (postAContainer, postBContainer) */
-}
-
-.parallel-posts-container2 {
-    display: flex;
-    gap: 1.5rem; /* Espaçamento entre os cards */
-    flex-wrap: wrap; /* Para responsividade em telas menores */
-    margin-top: 1rem; /* Espaço acima dos cards paralelos */
-}
-
-/* Cada slot que conterá um post-card ou um error-container inline */
-.parallel-posts-container2 > div { 
-    flex: 1 1 40%; /* Tenta ocupar ~45-50% da largura, permitindo quebra para 2 colunas */
-    min-width: 300px; /* Largura mínima antes de quebrar para uma única coluna */
-    /* O estilo do card (.post-card) ou do erro (.error-container.inline-error)
-       será aplicado ao conteúdo dentro destes divs (postAContainer, postBContainer) */
-}
-
-.error-container.inline-error {
-    padding: 1rem;
-    border: 1px solid #e53e3e; /* Cor de erro (vermelho) */
-    background-color: #fff5f5; /* Fundo levemente avermelhado */
-    border-radius: 8px;
-    color: #c53030;
-    /* Mantém uma aparência de "card" */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    height: 100%; /* Para ocupar o espaço do flex item se o conteúdo for pequeno */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.error-container.inline-error i {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-/* Ajuste opcional para loading spinner dentro dos cards paralelos */
-.parallel-posts-container .loading-container {
-    min-height: 150px; /* Para dar um tamanho mínimo enquanto carrega */
-    border: 1px dashed #ccc;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%; /* Ocupar todo o espaço do div pai (postAContainer/postBContainer) */
-}
-

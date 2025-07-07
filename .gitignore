@@ -9,6 +9,9 @@ nginx/certs/*
 # Arquivos de Imagens Docker salvas
 *.tar
 
+# Arquivos de Logs
+nginx/logs/*
+
 # Diretório do ambiente virtual Python
 venv/
 __pycache__/
