@@ -11,6 +11,7 @@ nginx/certs/*
 
 # Arquivos de Logs
 nginx/logs/*
+!nginx/logs/.gitkeep
 
 # Diretório do ambiente virtual Python
 venv/
