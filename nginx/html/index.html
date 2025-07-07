@@ -11,7 +11,7 @@
     <header>
         <div class="header-container">
             <div class="logo-container">
-                <img src="/images/logo.png" alt="Zagari's Home App Logo" class="logo">
+                <img src="images/logo.png" alt="Zagari's Home App Logo" class="logo">
             </div>
             <div class="title-container">
                 <h1>Zagari's Home App</h1>
@@ -23,34 +23,19 @@
         <div class="projects-grid">
             <div class="project-card">
                 <div class="card-header deepknow">
-                    <i class="project-icon fas fa-brain"></i>
+                    <i class="project-icon fas fa-gamepad"></i>
                 </div>
                 <div class="card-body">
-                    <h2 class="project-title">DeepKnow.AI</h2>
+                    <h2 class="project-title">Minecraft</h2>
                     <p class="project-description">
-                        Sistema de Intelligent Analytics com recursos avançados de processamento de dados e insights baseados em inteligência artificial.
+                        Aplicativo de gerenciamento de servidores Minecraft.
                     </p>
                 </div>
                 <div class="card-footer">
-                    <a href="/deepknow" class="project-link">Em breve</a>
+                    <a href="/minecraft" class="project-link">Acessar</a>
                 </div>
             </div>
-            
-            <div class="project-card">
-                <div class="card-header tax-calculator">
-                    <i class="project-icon fas fa-chart-line"></i>
-                </div>
-                <div class="card-body">
-                    <h2 class="project-title">Equities Tax Calculator</h2>
-                    <p class="project-description">
-                        Ferramenta especializada para cálculo de impostos sobre operações de renda variável, com suporte a diversos tipos de ativos.
-                    </p>
-                </div>
-                <div class="card-footer">
-                    <a href="/tax-calculator" class="project-link">Em breve</a>
-                </div>
-            </div>
-            
+
             <div class="project-card">
                 <div class="card-header book-bazaar">
                     <i class="project-icon fas fa-book"></i>
@@ -87,28 +72,5 @@
         <p>&copy; <script>document.write(new Date().getFullYear())</script> Castellabate Tech. Todos os direitos reservados.</p>
     </footer>
 
-    <script>
-        // Script para substituir URL base por variável de ambiente
-        document.addEventListener('DOMContentLoaded', function() {
-            const baseUrl = window.BASE_URL || 'castellabate.tech';
-            
-            // Atualizar href dos links com base na URL
-            const projectLinks = document.querySelectorAll('.project-link');
-            projectLinks.forEach(link => {
-                const path = link.getAttribute('href');
-                // Decide entre subdomínio ou subpasta
-                const useSubdomain = false; // Alternar para true se preferir subdomínios
-                
-                if (useSubdomain) {
-                    // Formato de subdomínio: projeto.dominio.com
-                    const subdomain = path.replace('/', '');
-                    link.setAttribute('href', `http://${subdomain}.${baseUrl}`);
-                } else {
-                    // Formato de subpasta: dominio.com/projeto
-                    link.setAttribute('href', `http://${baseUrl}${path}`);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
