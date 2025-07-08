@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # Configurações do Screensaver
 TMUX_SESSION_NAME = "screensaver_session"
-SCREENSAVER_DIR = "/home/zagari/screensaver"
+SCREENSAVER_DIR = "/app/screensaver_files"
 SCREENSAVER_COMMAND = "python3 screensaver.py 2>&1 | tee -a logs/screensaver.log"
 FULL_COMMAND = (
     f"export DISPLAY=:0; "

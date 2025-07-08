@@ -7,6 +7,24 @@ services:
     ports:
       # Mapeia a porta 5000 do container para a porta 5000 do host
       - "5000:5000"
+          # Equivalente a --ipc=host
+    ipc: host
+
+    # Equivalente a --device=/dev/...
+    # Usamos uma lista para mapear múltiplos dispositivos.
+    devices:
+      - "/dev/fb0:/dev/fb0"
+      - "/dev/tty0:/dev/tty0"
+      - "/dev/input:/dev/input"
+
+    # Equivalente a -v /caminho/host:/caminho/container
+    # Mapeia o diretório do seu script screensaver para dentro do container.
+    volumes:
+      - "./screensaver_mng:/app/screensaver_files"
+
+    # (Opcional) Equivalente a --privileged
+    # Descomente esta linha APENAS para troubleshooting, se o resto não funcionar.
+    # privileged: true
     networks:
       - web-net
     # Nenhuma porta exposta ao host. A comunicação é interna via Nginx.
