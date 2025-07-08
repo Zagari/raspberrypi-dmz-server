@@ -1,0 +1,89 @@
+<!-- templates/screensaver.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Screen Saver - Zagari's Home App</title>
+    <!-- Usamos url_for para o Flask encontrar o CSS na pasta static -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="page-screensaver">
+
+    <header>
+        <div class="header-container">
+            <div class="logo-container">
+                <!-- Certifique-se que o logo está em static/images/logo.png -->
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Zagari's Home App Logo" class="logo">
+            </div>
+            <div class="title-container">
+                <h1>Gerenciador de Screen Saver</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="control-panel">
+            <h2><i class="fas fa-tv"></i> Controle do Screensaver</h2>
+
+            <div class="status-display">
+                Status: <span id="status" class="status-unknown">Desconhecido</span>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn btn-start" onclick="sendCommand('start')"><i class="fas fa-play"></i> Ligar</button>
+                <button class="control-btn btn-stop" onclick="sendCommand('stop')"><i class="fas fa-stop"></i> Desligar</button>
+                <button class="control-btn btn-change" onclick="sendCommand('change')"><i class="fas fa-wand-magic-sparkles"></i> Mudar Efeito</button>
+            </div>
+
+            <div id="message">Clique em um botão para enviar um comando.</div>
+
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para Home</a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© <script>document.write(new Date().getFullYear())</script> Castellabate Tech. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const messageEl = document.getElementById('message');
+
+        async function sendCommand(command) {
+            messageEl.textContent = `Enviando comando: ${command}...`;
+            try {
+                // Usamos o endpoint /screensaver/<comando> para organizar melhor
+                const response = await fetch('/screensaver/' + command, { method: 'POST' });
+                const data = await response.json();
+                messageEl.textContent = `Resposta: ${data.message}`;
+                updateStatus();
+            } catch (error) {
+                messageEl.textContent = `Erro ao enviar comando: ${error}`;
+            }
+        }
+
+        async function updateStatus() {
+            try {
+                const response = await fetch('/screensaver/status');
+                const data = await response.json();
+                
+                if (data.status === 'running') {
+                    statusEl.textContent = 'Ligado';
+                    statusEl.className = 'status-running';
+                } else {
+                    statusEl.textContent = 'Desligado';
+                    statusEl.className = 'status-stopped';
+                }
+            } catch (error) {
+                statusEl.textContent = 'Erro de conexão';
+                statusEl.className = 'status-unknown';
+            }
+        }
+        
+        window.onload = updateStatus;
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>

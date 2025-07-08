@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Gerenciador de Screensaver</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 50px auto; background-color: #f4f4f9; color: #333; }
+        h1 { color: #0056b3; }
+        .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .controls { display: flex; gap: 10px; margin-top: 20px; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .btn-start { background-color: #28a745; }
+        .btn-start:hover { background-color: #218838; }
+        .btn-stop { background-color: #dc3545; }
+        .btn-stop:hover { background-color: #c82333; }
+        .btn-change { background-color: #007bff; }
+        .btn-change:hover { background-color: #0069d9; }
+        #status { font-weight: bold; }
+        #message { margin-top: 15px; padding: 10px; border-radius: 5px; background-color: #e9ecef; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gerenciador de Screensaver</h1>
+        <p>Status: <span id="status">Desconhecido</span></p>
+        
+        <div class="controls">
+            <button class="btn-start" onclick="sendCommand('start')">Ligar</button>
+            <button class="btn-stop" onclick="sendCommand('stop')">Desligar</button>
+            <button class="btn-change" onclick="sendCommand('change')">Mudar Efeito</button>
+        </div>
+
+        <div id="message">Clique em um botão para enviar um comando.</div>
+    </div>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const messageEl = document.getElementById('message');
+
+        async function sendCommand(command) {
+            messageEl.textContent = `Enviando comando: ${command}...`;
+            try {
+                const response = await fetch('/' + command, { method: 'POST' });
+                const data = await response.json();
+                messageEl.textContent = `Resposta: ${data.message}`;
+                updateStatus();
+            } catch (error) {
+                messageEl.textContent = `Erro ao enviar comando: ${error}`;
+            }
+        }
+
+        async function updateStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                statusEl.textContent = data.status === 'running' ? 'Ligado' : 'Desligado';
+                statusEl.style.color = data.status === 'running' ? '#28a745' : '#dc3545';
+            } catch (error) {
+                statusEl.textContent = 'Erro de conexão';
+                statusEl.style.color = '#dc3545';
+            }
+        }
+        
+        // Atualiza o status quando a página carrega e a cada 5 segundos
+        window.onload = updateStatus;
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>

@@ -6,8 +6,7 @@ WORKDIR /app
 # Atualizar repositórios e instalar pacotes necessários
 RUN apt-get update && apt-get install -y \
 bash \
-net-tools \
-iputils-ping \
+tmux \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 
@@ -15,6 +14,9 @@ iputils-ping \
 COPY requirements.txt .
 # Instalar dependências do Python
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar o código da aplicação para o diretório de trabalho
+COPY . .
 
 # Expõe a porta 5000 DENTRO da rede Docker para o Nginx se conectar
 EXPOSE 5000

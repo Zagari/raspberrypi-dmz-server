@@ -1,12 +1,16 @@
 services:
   # Serviço da Aplicação Web (Flask)
-  webapp:
-    build: ./app
-    container_name: flask_app
+  screensaver_service:
+    build: ./screensaver_mng
+    container_name: screensaver
     restart: unless-stopped
+    ports:
+      # Mapeia a porta 5000 do container para a porta 5000 do host
+      - "5000:5000"
     networks:
       - web-net
     # Nenhuma porta exposta ao host. A comunicação é interna via Nginx.
+
 
   # Serviço do Nginx (Reverse Proxy)
   nginx:
@@ -35,7 +39,7 @@ services:
     networks:
       - web-net
     depends_on:
-      - webapp # Garante que o Nginx só inicie após a aplicação web
+      - screensaver_service # Garante que o Nginx só inicie após a aplicação web
     # Se você usar variáveis de ambiente no template, adicione a seção 'environment' aqui.
     environment:
       - SERVER_NAME=192.168.15.4 # Altere para o IP do seu servidor ou domínio
