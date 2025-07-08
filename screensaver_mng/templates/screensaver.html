@@ -47,15 +47,42 @@
         <p>© <script>document.write(new Date().getFullYear())</script> Castellabate Tech. Todos os direitos reservados.</p>
     </footer>
 
+
+
+    <script>
+        // Criamos um objeto JS chamado 'apiUrls'
+        // A chave é o nome do comando (ex: 'on')
+        // O valor é a URL completa gerada pelo url_for
+        const apiUrls = {
+            'start':    "{{ url_for('start_screensaver') }}",
+            'stop':     "{{ url_for('stop_screensaver') }}",
+            'status':   "{{ url_for('screensaver_status') }}",
+            'change':   "{{ url_for('change_effect') }}",
+        };
+    </script>
+
     <script>
         const statusEl = document.getElementById('status');
         const messageEl = document.getElementById('message');
 
         async function sendCommand(command) {
             messageEl.textContent = `Enviando comando: ${command}...`;
+
+            // 1. Procure a URL correta no nosso objeto 'apiUrls'
+            const finalUrl = apiUrls[command];
+
+            // 2. Verifique se o comando é válido (se a URL existe)
+            if (!finalUrl) {
+                messageEl.textContent = `Erro: Comando '${command}' é desconhecido.`;
+                return;
+            }
+    
             try {
                 // Usamos o endpoint /screensaver/<comando> para organizar melhor
-                const response = await fetch('/screensaver/' + command, { method: 'POST' });
+                const response = await fetch(finalUrl, { method: 'POST' });
+                if (!response.ok) {
+                    throw new Error(`Erro de rede: ${response.status}`);
+                }
                 const data = await response.json();
                 messageEl.textContent = `Resposta: ${data.message}`;
                 updateStatus();
@@ -66,7 +93,8 @@
 
         async function updateStatus() {
             try {
-                const response = await fetch('/screensaver/status');
+                const finalUrl = apiUrls['status'];
+                const response = await fetch(finalUrl);
                 const data = await response.json();
                 
                 if (data.status === 'running') {

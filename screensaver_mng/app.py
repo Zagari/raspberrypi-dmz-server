@@ -63,9 +63,6 @@ def screensaver_page():
     """Serve a página de gerenciamento do screensaver."""
     return render_template('screensaver.html')
 
-app.wsgi_app = ProxyFix(
-    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
-)
 
 # --- ROTAS DA API DO SCREENSAVER ---
 
@@ -118,6 +115,10 @@ def change_effect():
         
     return jsonify({"status": "success", "message": "Comando para mudar o efeito enviado."})
 
+
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+)
 
 
 if __name__ == '__main__':
