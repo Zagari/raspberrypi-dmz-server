@@ -20,7 +20,7 @@ services:
     # Equivalente a -v /caminho/host:/caminho/container
     # Mapeia o diretório do seu script screensaver para dentro do container.
     volumes:
-      - "./screensaver_mng:/app/screensaver_files"
+      - "./screensaver_mng/screensaver_files:/app/screensaver_files"
 
     # (Opcional) Equivalente a --privileged
     # Descomente esta linha APENAS para troubleshooting, se o resto não funcionar.
