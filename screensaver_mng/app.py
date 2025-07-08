@@ -19,11 +19,33 @@ FULL_COMMAND = (
 )
 
 def run_command(command):
+    """
+    Executa um comando no shell e retorna uma tupla (sucesso, saida_ou_erro).
+    Captura exceções de forma mais genérica.
+    """
     try:
-        subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
-        return True, ""
+        # Usamos 'stderr=subprocess.PIPE' para capturar erros mesmo com 'check=False'
+        result = subprocess.run(
+            command, 
+            shell=True, 
+            check=True,  # check=True faz com que um erro lance CalledProcessError
+            capture_output=True, 
+            text=True
+        )
+        return (True, result.stdout)
     except subprocess.CalledProcessError as e:
-        return False, e.stderr
+        # O comando executou mas retornou um código de erro (ex: diretório não existe)
+        error_message = f"Comando falhou com código {e.returncode}:\n{e.stderr}"
+        return (False, error_message)
+    except FileNotFoundError:
+        # O comando em si não foi encontrado (ex: 'tmux' não está instalado)
+        error_message = f"Erro: Comando não encontrado. Verifique se '{command.split()[0]}' está instalado e no PATH."
+        return (False, error_message)
+    except Exception as e:
+        # Captura qualquer outra exceção inesperada
+        error_message = f"Um erro inesperado ocorreu: {str(e)}"
+        return (False, error_message)
+
 
 def is_session_running():
     result = subprocess.run(f"tmux has-session -t {TMUX_SESSION_NAME}", shell=True)
@@ -60,8 +82,17 @@ def start_screensaver():
     if is_session_running():
         return jsonify({"status": "error", "message": "Screensaver já está rodando."}), 409
     
-    run_command(f"tmux new-session -d -s {TMUX_SESSION_NAME}")
-    run_command(f"tmux send-keys -t {TMUX_SESSION_NAME} '{FULL_COMMAND}' C-m")
+    # 1. Cria a sessão
+    success, output = run_command(f"tmux new-session -d -s {TMUX_SESSION_NAME}")
+    if not success:
+        # Se falhar, retorna o erro para o frontend
+        return jsonify({"status": "error", "message": output}), 500
+
+    # 2. Envia o comando para a sessão
+    success, output = run_command(f"tmux send-keys -t {TMUX_SESSION_NAME} '{FULL_COMMAND}' C-m")
+    if not success:
+        # Se falhar, também retorna o erro
+        return jsonify({"status": "error", "message": output}), 500
     
     return jsonify({"status": "success", "message": "Comando para iniciar o screensaver enviado."})
 
@@ -70,7 +101,10 @@ def stop_screensaver():
     if not is_session_running():
         return jsonify({"status": "error", "message": "Screensaver não está rodando."}), 404
         
-    run_command(f"tmux kill-session -t {TMUX_SESSION_NAME}")
+    success, output = run_command(f"tmux kill-session -t {TMUX_SESSION_NAME}")
+    if not success:
+        return jsonify({"status": "error", "message": output}), 500
+
     return jsonify({"status": "success", "message": "Screensaver encerrado."})
 
 @app.route('/screensaver/change', methods=['POST'])
@@ -78,8 +112,12 @@ def change_effect():
     if not is_session_running():
         return jsonify({"status": "error", "message": "Screensaver não está rodando."}), 404
         
-    run_command(f"tmux send-keys -t {TMUX_SESSION_NAME}:0.0 ' '")
+    success, output = run_command(f"tmux send-keys -t {TMUX_SESSION_NAME}:0.0 ' '")
+    if not success:
+        return jsonify({"status": "error", "message": output}), 500
+        
     return jsonify({"status": "success", "message": "Comando para mudar o efeito enviado."})
+
 
 
 if __name__ == '__main__':
