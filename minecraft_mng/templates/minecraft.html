@@ -1,0 +1,159 @@
+<!-- templates/minecraft.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Servidor Minecraft - Zagari's Home App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Adicione este estilo para esconder/mostrar o botão de reset */
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="page-minecraft">
+
+    <header>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Zagari's Home App Logo" class="logo">
+            </div>
+            <div class="title-container">
+                <h1>Gerenciador de Servidor Minecraft</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="control-panel">
+            <h2><i class="fas fa-server"></i> Controle do Servidor</h2>
+
+            <div class="status-display">
+                Status: <span id="status" class="status-unknown">Desconhecido</span>
+            </div>
+
+            <div class="controls">
+                <button id="btn-start" class="control-btn btn-start" onclick="sendCommand('start')"><i class="fas fa-play"></i> Iniciar Servidor</button>
+                <button id="btn-stop" class="control-btn btn-stop" onclick="sendCommand('stop')"><i class="fas fa-power-off"></i> Backup e Parar</button>
+                <button id="btn-reset" class="control-btn btn-reset hidden" onclick="resetStatus()"><i class="fas fa-undo"></i> Resetar Estado</button>
+            </div>
+
+            <div id="message">Clique em um botão para enviar um comando.</div>
+
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Voltar para Home</a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>© <script>document.write(new Date().getFullYear())</script> Castellabate Tech. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        const apiUrls = {
+            'start': "{{ url_for('start_server') }}",
+            'stop':  "{{ url_for('stop_server') }}",
+            'status':"{{ url_for('get_status') }}",
+            'reset': "{{ url_for('reset_status') }}"
+        };
+    </script>
+
+    <script>
+        // Referências para todos os elementos que vamos manipular
+        const statusEl = document.getElementById('status');
+        const messageEl = document.getElementById('message');
+        const btnStart = document.getElementById('btn-start');
+        const btnStop = document.getElementById('btn-stop');
+        const btnReset = document.getElementById('btn-reset');
+
+        // Função para enviar os comandos principais
+        async function sendCommand(command) {
+            // Desabilita botões imediatamente para feedback rápido
+            btnStart.disabled = true;
+            btnStop.disabled = true;
+
+            const finalUrl = apiUrls[command];
+            if (!finalUrl) {
+                messageEl.textContent = `Erro: Comando '${command}' é desconhecido.`;
+                return;
+            }
+
+            try {
+                const response = await fetch(finalUrl, { method: 'POST' });
+                const data = await response.json();
+                messageEl.textContent = `Resposta do Servidor: ${data.message}`;
+                updateStatus(); // Atualiza o status imediatamente
+            } catch (error) {
+                messageEl.textContent = `Erro ao enviar comando: ${error}`;
+            }
+        }
+
+        // Nova função para resetar o estado de erro
+        async function resetStatus() {
+            try {
+                const response = await fetch(apiUrls['reset'], { method: 'POST' });
+                const data = await response.json();
+                messageEl.textContent = data.message;
+                updateStatus(); // Força a atualização para refletir o novo estado
+            } catch (error) {
+                messageEl.textContent = `Erro ao resetar: ${error}`;
+            }
+        }
+
+        // Função principal que gerencia o estado da UI
+        async function updateStatus() {
+            try {
+                const response = await fetch(apiUrls['status']);
+                if (!response.ok) throw new Error(`Erro de rede: ${response.status}`);
+                const data = await response.json();
+                
+                // Atualiza os textos
+                statusEl.textContent = data.current_process || 'desconhecido';
+                statusEl.className = `status-${data.current_process || 'unknown'}`;
+                messageEl.textContent = data.message || 'Aguardando...';
+
+                // Lógica central para habilitar/desabilitar botões
+                switch (data.current_process) {
+                    case 'idle': // Servidor parado, pronto para iniciar
+                        btnStart.disabled = false;
+                        btnStop.disabled = true;
+                        btnReset.classList.add('hidden');
+                        break;
+                    case 'running': // Servidor rodando, pronto para parar
+                        btnStart.disabled = true;
+                        btnStop.disabled = false;
+                        btnReset.classList.add('hidden');
+                        break;
+                    case 'starting': // Processo de início em andamento
+                    case 'stopping': // Processo de parada em andamento
+                        btnStart.disabled = true;
+                        btnStop.disabled = true;
+                        btnReset.classList.add('hidden');
+                        break;
+                    case 'error': // Ocorreu um erro
+                        btnStart.disabled = true;
+                        btnStop.disabled = true;
+                        btnReset.classList.remove('hidden'); // Mostra o botão de reset
+                        break;
+                    default: // Estado desconhecido
+                        btnStart.disabled = true;
+                        btnStop.disabled = true;
+                        btnReset.classList.add('hidden');
+                        break;
+                }
+            } catch (error) {
+                statusEl.textContent = 'Erro de conexão';
+                statusEl.className = 'status-unknown';
+                messageEl.textContent = 'Não foi possível conectar ao backend.';
+                btnStart.disabled = true;
+                btnStop.disabled = true;
+                btnReset.classList.add('hidden');
+            }
+        }
+        
+        // Inicia o ciclo
+        window.onload = updateStatus;
+        setInterval(updateStatus, 5000);
+    </script>
+</body>
+</html>

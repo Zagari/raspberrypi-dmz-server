@@ -1,0 +1,6 @@
+[castellabate_server:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+[castellabate_server]
+seu_ip_publico_aqui ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+

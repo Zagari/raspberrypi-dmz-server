@@ -4,16 +4,17 @@ services:
     build: ./screensaver_mng
     container_name: screensaver
     restart: unless-stopped
-    ports:
+    # Nenhuma porta exposta ao host. A comunicação é interna via Nginx.
+    # ports:
       # Mapeia a porta 5000 do container para a porta 5000 do host
-      - "5000:5000"
-          # Equivalente a --ipc=host
+      # - "5000:5000"
+    # Equivalente a --ipc=host
     ipc: host
 
     # Equivalente a --device=/dev/...
     # Usamos uma lista para mapear múltiplos dispositivos.
     devices:
-      - "/dev/fb0:/dev/fb0"
+      # - "/dev/fb0:/dev/fb0"
       - "/dev/tty0:/dev/tty0"
       - "/dev/input:/dev/input"
 
@@ -24,11 +25,41 @@ services:
 
     # (Opcional) Equivalente a --privileged
     # Descomente esta linha APENAS para troubleshooting, se o resto não funcionar.
-    # privileged: true
+    privileged: true
     networks:
       - web-net
-    # Nenhuma porta exposta ao host. A comunicação é interna via Nginx.
 
+  # Serviço de Gerenciamento do Minecraft
+  minecraft_service:
+    # Se você quiser construir a imagem localmente, descomente a linha abaixo
+    build: ./minecraft_mng
+    # Se você já publicou a imagem no Docker Hub, comente a linha de "build" e use a linha "image" abaixo
+    # Aponta para a imagem que você publicou no Docker Hub
+    # image: 'seu-usuario-docker'/minecraft_mng:latest
+    container_name: minecraft
+    restart: always
+    volumes:
+      # Mapeia os scripts para dentro do contêiner
+      - ./minecraft_mng/terraform:/app/terraform
+      - ./minecraft_mng/ansible:/app/ansible
+      # Mapeia sua chave SSH para o Ansible poder usar
+      - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+      # Mapeia o arquivo de segredos do Vault para dentro do contêiner
+      # Você deve criar o 'secrets.yml' na pasta 'minecraft_mng/ansible/' da sua máquina local
+      - ./minecraft_mng/ansible/secrets.yml:/app/ansible/secrets.yml:ro
+      # Mapeia a chave pública para o Terraform
+      - ~/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro
+    environment:
+      # Forma segura de passar a senha do Vault.
+      # Crie um arquivo .env na raiz do projeto e adicione a linha:
+      # ANSIBLE_VAULT_PASSWORD=sua_senha_super_secreta
+      - ANSIBLE_VAULT_PASSWORD=${ANSIBLE_VAULT_PASSWORD}
+      # Passa as credenciais da AWS para o Terraform e o cliente AWS
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+    networks:
+      - web-net
 
   # Serviço do Nginx (Reverse Proxy)
   nginx:
@@ -57,26 +88,11 @@ services:
     networks:
       - web-net
     depends_on:
-      - screensaver_service # Garante que o Nginx só inicie após a aplicação web
+      # - screensaver_service # Garante que o Nginx só inicie após a aplicação web
+      - minecraft_service # Garante que o Nginx só inicie após o serviço Minecraft
     # Se você usar variáveis de ambiente no template, adicione a seção 'environment' aqui.
     environment:
-      - SERVER_NAME=192.168.15.4 # Altere para o IP do seu servidor ou domínio
-
-# Nota sobre Minecraft: Se você quiser adicionar um servidor Minecraft,
-# você adicionaria um novo serviço aqui e mapearia a porta:
-#
-# minecraft-server:
-#   image: itzg/minecraft-server
-#   container_name: minecraft
-#   restart: unless-stopped
-#   ports:
-#     - "25565:25565"
-#   environment:
-#     EULA: "TRUE"
-#   volumes:
-#     - ./minecraft-data:/data
-#   networks:
-#     - web-net
+      - SERVER_NAME=${NGINX_SERVER_NAME} # Altere para o IP do seu servidor ou domínio
 
 networks:
   web-net:

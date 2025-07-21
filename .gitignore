@@ -1,6 +1,7 @@
 # Arquivos de ambiente
 .env
 backup/
+secrets.yml
 
 # Arquivos de Certificados
 nginx/certs/*
@@ -12,6 +13,23 @@ nginx/certs/*
 # Arquivos de Logs
 nginx/logs/*
 !nginx/logs/.gitkeep
+
+# Arquivos de Configuração do Terraform
+minecraft_mng/terraform/*.tfstate
+minecraft_mng/terraform/*.tfstate.backup
+minecraft_mng/terraform/terraform.tfvars
+minecraft_mng/terraform/terraform.tfvars.json
+minecraft_mng/terraform/.terraform/
+minecraft_mng/terraform/.terraform.lock.hcl
+
+# Arquivos de Configuração do Ansible
+inventory.ini
+*.retry
+
+# Chaves privadas e credenciais
+*.pem
+*.key
+id_rsa
 
 # Diretório do ambiente virtual Python
 venv/

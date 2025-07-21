@@ -1,0 +1,209 @@
+/* static/styles.css */
+
+:root {
+    --primary-color: #4895ef;
+    --secondary-color: #4cc9f0;
+    --accent-color: #3a0ca3;
+    --tertiary-color: #7209b7;
+    --light-color: #f8f9fa;
+    --dark-color: #212529;
+    --transition: all 0.3s ease;
+    
+    /* Cores tema do Minecraft - conforme solicitado */
+    --mc-color-1: #3a0ca3;
+    --mc-color-2: #4361ee;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #e6f8ff 0%, #d8eeff 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--dark-color);
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 2rem 0;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logo-container .logo {
+    height: 60px;
+    width: auto;
+    border-radius: 8px;
+}
+
+.title-container {
+    text-align: left;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 0;
+    flex: 1;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+/* --- ESTILOS DA HOMEPAGE (Se precisar) --- */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.6rem;
+    margin-top: 3rem;
+}
+/* ... (outros estilos da home) ... */
+
+/* Cores específicas para cada card */
+.minecraft { background: linear-gradient(135deg, var(--mc-color-1) 0%, var(--mc-color-2) 100%); }
+/* ... (outros cards) ... */
+
+
+/* --- ESTILOS PARA A PÁGINA DO MINECRAFT --- */
+
+body.page-minecraft header {
+    background: linear-gradient(135deg, var(--mc-color-1) 0%, var(--mc-color-2) 100%);
+}
+
+.control-panel {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.control-panel h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--dark-color);
+}
+
+.status-display {
+    margin: 1.5rem 0;
+    font-size: 1.2rem;
+}
+
+#status {
+    font-weight: bold;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    color: white;
+    text-transform: uppercase;
+    min-width: 100px;
+    display: inline-block;
+}
+
+#status.status-running { background-color: #28a745; } /* Verde - Rodando */
+#status.status-idle { background-color: #6c757d; } /* Cinza - Parado/Pronto */
+#status.status-starting { background-color: #007bff; } /* Azul - Iniciando */
+#status.status-stopping { background-color: #ffc107; } /* Laranja - Parando */
+#status.status-error { background-color: #dc3545; } /* Vermelho - Erro */
+#status.status-unknown { background-color: #343a40; } /* Preto - Desconhecido */
+
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.control-btn {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: white;
+    transition: var(--transition);
+    min-width: 150px;
+}
+.control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-start { background-color: #28a745; }
+.btn-stop { background-color: #dc3545; }
+
+
+#message {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #f1f1f1;
+    color: #333;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 2rem;
+    color: var(--mc-color-1);
+    text-decoration: none;
+    font-weight: 500;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.btn-reset { background-color: #ffc107; color: #212529; } /* Laranja */
+
+/* Estilo para QUALQUER botão de controle quando estiver desabilitado */
+.control-btn:disabled {
+    background-color: #adb5bd; /* Um cinza mais explícito */
+    border-color: #adb5bd;
+    cursor: not-allowed; /* Muda o cursor do mouse para um ícone de "proibido" */
+    transform: none; /* Remove efeitos de hover, como o de levantar */
+    box-shadow: none;
+}
+
+/* --- RODAPÉ E RESPONSIVIDADE --- */
+footer {
+    background-color: var(--dark-color);
+    color: white;
+    text-align: center;
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+@media (max-width: 768px) {
+    .header-container { flex-direction: column; gap: 1rem; }
+    .title-container { text-align: center; }
+    h1 { font-size: 2rem; }
+}
