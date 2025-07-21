@@ -13,6 +13,8 @@ nginx/certs/*
 # Arquivos de Logs
 nginx/logs/*
 !nginx/logs/.gitkeep
+screensaver_mng/screensaver_files/logs/*
+!screensaver_mng/screensaver_files/logs/.gitkeep
 
 # Arquivos de Configuração do Terraform
 minecraft_mng/terraform/*.tfstate
