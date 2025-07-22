@@ -31,11 +31,8 @@ RUN \
     && unzip terraform.zip -d /usr/local/bin \
     && rm terraform.zip
 
-# Instala o Ansible
-RUN pip install ansible --no-cache-dir ansible
-
-# Instala a coleção Ansible necessária durante o build
-RUN ansible-galaxy collection install community.docker
+# Instala APENAS o motor do Ansible para manter a imagem leve
+RUN pip install ansible-core --no-cache-dir
 
 # Define o diretório de trabalho
 WORKDIR /app
@@ -50,12 +47,16 @@ RUN cd /app/terraform && \
     terraform init && \
     terraform import aws_key_pair.main castellabate-key || echo "Falha ao importar a chave, talvez não exista. Continuando o build."
 
-# Copia os arquivos de dependências e os instala
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copia o resto da aplicação
+# Copia TODA a aplicação
 COPY . .
+
+# Instala a coleção Ansible DENTRO do diretório do projeto,
+# no local que o ansible.cfg espera.
+# A flag -p especifica o caminho (path) de instalação.
+RUN ansible-galaxy collection install community.docker -p /app/collections
+
+# Copia os arquivos de dependências e os instala
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expõe a porta que o Gunicorn vai rodar
 EXPOSE 5001

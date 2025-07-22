@@ -32,6 +32,7 @@ inventory.ini
 *.pem
 *.key
 id_rsa
+id_ed25519
 
 # Diretório do ambiente virtual Python
 venv/

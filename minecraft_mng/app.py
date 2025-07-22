@@ -79,6 +79,50 @@ def run_command(command, cwd):
     
     return True
 
+def run_ansible_command(command, cwd, vault_password):
+    # Crie uma cópia do ambiente atual para não poluir o processo principal
+    env = os.environ.copy()
+    
+    # A MUDANÇA CRÍTICA ESTÁ AQUI:
+    env['ANSIBLE_CONFIG'] = os.path.join(ANSIBLE_DIR, '/ansible.cfg')
+    
+    """Executa um comando ansible-playbook, passando a senha do Vault via stdin."""
+    log_line = f"Executando Ansible: {' '.join(command)} em {cwd}"
+    print(log_line)
+    with status_lock:
+        status['last_log'].append(log_line)
+
+    # Inicia o processo com stdin configurado como um 'pipe' para que possamos escrever nele
+    process = subprocess.Popen(
+        command,
+        env=env, # Passa o ambiente modificado para o subprocesso
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE,  # <-- A MUDANÇA CRUCIAL
+        text=True
+    )
+
+    # Envia a senha para o stdin do processo e captura a saída
+    # O método .communicate() lida com o envio, leitura e espera pelo fim do processo.
+    stdout_output, stderr_output = process.communicate(input=vault_password)
+
+    # Exibe a saída nos logs do container para depuração
+    if stdout_output:
+        print(stdout_output)
+        with status_lock:
+            status['last_log'].extend(stdout_output.splitlines())
+    if stderr_output:
+        print(stderr_output)
+        with status_lock:
+            status['last_log'].extend(stderr_output.splitlines())
+
+    # Verifica o código de retorno
+    if process.returncode != 0:
+        error_message = f"Erro ao executar comando Ansible: {stderr_output}"
+        raise Exception(error_message)
+    
+    return True
 
 def update_inventory(ip_address):
     """Atualiza o IP no arquivo de inventário do Ansible."""
@@ -127,15 +171,17 @@ def start_minecraft_process():
         update_inventory(public_ip)
         
         # 4. Executar playbooks Ansible
-        ansible_command_base = ['ansible-playbook', '-i', ANSIBLE_INVENTORY, '--vault-password-file', '/dev/stdin']
+        ansible_base_cmd = ['ansible-playbook', '-i', ANSIBLE_INVENTORY]
+        # Adicionamos --vault-password-file /dev/stdin APENAS para os playbooks que precisam
+        ansible_vault_cmd_base = ansible_base_cmd + ['--vault-password-file', '/dev/stdin']
         
         with status_lock:
             status['message'] = 'Executando playbook do Cloudflare...'
-        run_command(ansible_command_base + ['deploy_updt_cloudflare.yml'], ANSIBLE_DIR)
+        run_ansible_command(ansible_vault_cmd_base + ['deploy_updt_cloudflare.yml'], ANSIBLE_DIR, ANSIBLE_VAULT_PASS)
         
         with status_lock:
             status['message'] = 'Executando playbook do Minecraft...'
-        run_command(ansible_command_base + ['deploy_minecraft.yml'], ANSIBLE_DIR)
+        run_command(ansible_base_cmd + ['deploy_minecraft.yml'], ANSIBLE_DIR)
 
         # Sucesso!
         with status_lock:
@@ -160,8 +206,14 @@ def stop_minecraft_process():
             status['last_log'] = []
 
         # 1. Executar playbook de backup
-        ansible_command_base = ['ansible-playbook', '-i', ANSIBLE_INVENTORY, '--vault-password-file', '/dev/stdin']
-        run_command(ansible_command_base + ['backup_minecraft.yml'], ANSIBLE_DIR)
+        ansible_vault_cmd_base = ['ansible-playbook', '-i', ANSIBLE_INVENTORY, '--vault-password-file', '/dev/stdin']
+        
+        with status_lock:
+            status['current_process'] = 'stopping'
+            status['message'] = 'Fazendo backup do mundo Minecraft...'
+            status['last_log'] = []
+        # ==> USA A NOVA FUNÇÃO AQUI <==
+        run_ansible_command(ansible_vault_cmd_base + ['backup_minecraft.yml'], ANSIBLE_DIR, ANSIBLE_VAULT_PASS)
 
         # 2. Destruir infra com Terraform
         # ==> GARANTIR QUE O TERRAFORM ESTEJA PRONTO PARA DESTRUIR

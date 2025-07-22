@@ -5,7 +5,7 @@ provider "aws" {
 
 resource "aws_key_pair" "main" {
   key_name = "castellabate-key"
-  public_key = file("~/.ssh/id_rsa.pub")  #  ← precisa ser igual ao que já está na AWS ou apagar a chave via console ou mudar o nome da key
+  public_key = file("~/.ssh/id_ed25519.pub")  #  ← precisa ser igual ao que já está na AWS ou apagar a chave via console ou mudar o nome da key
 }
 
 resource "aws_security_group" "castellabate_sg" {
@@ -65,7 +65,7 @@ resource "aws_instance" "castellabate" {
   # facilmente mudar para sub-rede[1] sem reescrever a rede.
   # Para uma robustez ainda maior, um Auto Scaling Group seria usado, pois ele pode
   # tentar lançar em múltiplas sub-redes. Mas para uma única instância, isso é suficiente.
-  subnet_id                   = aws_subnet.public[0].id
+  subnet_id                   = aws_subnet.public[5].id
   vpc_security_group_ids      = [aws_security_group.castellabate_sg.id]
   associate_public_ip_address = true
   user_data                   = file("user_data.sh")
@@ -83,7 +83,7 @@ resource "aws_instance" "castellabate" {
   instance_market_options {
     market_type = "spot"
     spot_options {
-      max_price                    = "0.0295"
+      max_price                    = "0.0330"
       spot_instance_type          = "persistent"
       instance_interruption_behavior = "stop"
     }

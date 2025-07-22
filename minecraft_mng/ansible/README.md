@@ -50,7 +50,7 @@ MINECRAFT_RECORD_ID: "a_second_record_id_here"
 
 Salve e feche o editor. Para editar este arquivo no futuro, use o comando 
 ```bash
-ansible-vault edit secrets.yml`.
+ansible-vault edit secrets.yml
 ```
 
 c. **Crie o arquivo de template `.env.j2`**

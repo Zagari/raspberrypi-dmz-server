@@ -43,12 +43,12 @@ services:
       - ./minecraft_mng/terraform:/app/terraform
       - ./minecraft_mng/ansible:/app/ansible
       # Mapeia sua chave SSH para o Ansible poder usar
-      - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+      - ~/.ssh/id_ed25519:/root/.ssh/id_ed25519:ro
       # Mapeia o arquivo de segredos do Vault para dentro do contêiner
       # Você deve criar o 'secrets.yml' na pasta 'minecraft_mng/ansible/' da sua máquina local
       - ./minecraft_mng/ansible/secrets.yml:/app/ansible/secrets.yml:ro
       # Mapeia a chave pública para o Terraform
-      - ~/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub:ro
+      - ~/.ssh/id_ed25519.pub:/root/.ssh/id_ed25519.pub:ro
     environment:
       # Forma segura de passar a senha do Vault.
       # Crie um arquivo .env na raiz do projeto e adicione a linha:
@@ -88,7 +88,7 @@ services:
     networks:
       - web-net
     depends_on:
-      # - screensaver_service # Garante que o Nginx só inicie após a aplicação web
+      - screensaver_service # Garante que o Nginx só inicie após a aplicação web
       - minecraft_service # Garante que o Nginx só inicie após o serviço Minecraft
     # Se você usar variáveis de ambiente no template, adicione a seção 'environment' aqui.
     environment:
